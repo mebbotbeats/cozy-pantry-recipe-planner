@@ -3,6 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+   // BRUTE FORCE DEBUG
+  if (!process.env.GROQ_API_KEY) return res.status(500).json({ error: "MISSING_GROQ_KEY" });
+  if (!process.env.SUPABASE_URL) return res.status(500).json({ error: "MISSING_SUPABASE_URL" });
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return res.status(500).json({ error: "MISSING_SUPABASE_KEY" });
 
   // 0. Debug Logging (View this in Vercel Logs to see what's missing)
   console.log("Checking Environment:", {
