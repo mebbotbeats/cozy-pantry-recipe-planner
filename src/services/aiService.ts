@@ -1,6 +1,5 @@
 import { Ingredient, IngredientSize, MealPlanResponse, PantryOrganizeResponse } from "../types";
 
-// Helper to get headers with the Supabase Auth Token
 const getAuthHeaders = () => {
   const token = localStorage.getItem("supabase-token");
   return {
@@ -19,10 +18,9 @@ export async function organizePantry(input: string): Promise<Ingredient[]> {
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      if (errData.error === "OUT_OF_CREDITS") {
-        throw new Error("You are out of credits! Please refill to stock more items.");
-      }
-      throw new Error(errData.error || "Please sign in to organize your pantry.");
+      if (errData.error === "OUT_OF_CREDITS") throw new Error("You are out of credits! Please refill.");
+      // Fix: Don't guess "Please sign in". Show the real error or a server crash message!
+      throw new Error(errData.error || `Server connection failed (Error ${response.status}). Please try again.`);
     }
 
     const data: PantryOrganizeResponse = await response.json();
@@ -34,7 +32,7 @@ export async function organizePantry(input: string): Promise<Ingredient[]> {
   } catch (error: any) {
     console.error("Pantry organization failed:", error);
     alert(error.message); 
-    return [];
+    return[];
   }
 }
 
@@ -48,19 +46,15 @@ export async function generateMealPlan(ingredients: Ingredient[]): Promise<MealP
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      if (errData.error === "OUT_OF_CREDITS") {
-        throw new Error("You are out of credits! Please refill to consult the chef.");
-      }
-      throw new Error(errData.error || "Please sign in to consult the chef.");
+      if (errData.error === "OUT_OF_CREDITS") throw new Error("You are out of credits! Please refill.");
+      throw new Error(errData.error || `Server connection failed (Error ${response.status}). Please try again.`);
     }
 
     return await response.json();
   } catch (error: any) {
     console.error("Meal plan generation failed:", error);
     alert(error.message);
-    // Return a default object so the app doesn't crash
-    return {
-      plan: [],
+    return { plan: [],
       encouragement: "Oh dear, the chef couldn't connect. Please check your login."
     };
   }
