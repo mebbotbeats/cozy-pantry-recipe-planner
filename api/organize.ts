@@ -4,62 +4,49 @@ import { createClient } from "@supabase/supabase-js";
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
+  // Force-fallback the URL if Vercel Environment Variables aren't loading
+  const supabaseUrl = process.env.SUPABASE_URL || "https://hnkbkrslozsczjlbeepj.supabase.co";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const groqKey = process.env.GROQ_API_KEY;
+
+  // Debug log: Check this in Vercel Logs if it still fails
+  console.log("Environment Status:", { 
+    url: supabaseUrl, 
+    hasKey: !!supabaseKey, 
+    hasGroq: !!groqKey 
+  });
+
+  if (!supabaseUrl.startsWith("https://") || !supabaseKey || !groqKey) {
+    return res.status(500).json({ error: "Server Configuration Error: Missing or Invalid Keys" });
+  }
+
+  const groq = new Groq({ apiKey: groqKey });
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
-    // 1. Initialize inside the safety net
-    if (!process.env.GROQ_API_KEY || !process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error("Server Configuration Error: Missing Keys in Vercel.");
-    }
-
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-
-    // 2. Verify User Token
     const token = req.headers.authorization?.split("Bearer ")[1];
     if (!token) throw new Error("Unauthorized. No token provided.");
 
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
-    if (authErr || !user) throw new Error(`Auth Error: ${authErr?.message || "Invalid token"}`);
+    if (authErr || !user) throw new Error("Invalid token.");
 
-    // 3. Check Credits
-    const { data: profile, error: profileErr } = await supabase
-      .from('profiles')
-      .select('credits')
-      .eq('id', user.id)
-      .single();
-    
-    if (profileErr) throw new Error(`Database Error: ${profileErr.message}`);
+    const { data: profile } = await supabase.from('profiles').select('credits').eq('id', user.id).single();
     if (!profile || profile.credits <= 0) return res.status(403).json({ error: "OUT_OF_CREDITS" });
 
-    // 4. AI Logic
     const { input } = req.body;
     const completion = await groq.chat.completions.create({
-      messages:[
-        {
-          role: "system",
-          content: `You are a cozy pantry organizer. Categorize these foods into real-world storage logic. 
-          STRICT RULES:
-          1. ONLY process the items listed in the input. Do NOT add any extra ingredients.
-          2. Every input item must have a corresponding entry in the output.
-          3. Return a JSON object with an 'items' array. Each item must have:
-          - label: a refined handwritten-style label
-          - originalName: EXACTLY the name from user input
-          - color: a muted warm hex code
-          - size: 'small', 'medium', 'tall', 'wide', or 'large'
-          - shelf: integer 1 to 5`
-        },
+      messages: [
+        { role: "system", content: "You are a cozy pantry organizer. Return JSON with an 'items' array. Each item: label, originalName, color, size, shelf." },
         { role: "user", content: input }
       ],
-      model: "openai/gpt-oss-120b", // Your preferred model!
+      model: "openai/gpt-oss-120b",
       response_format: { type: "json_object" }
     });
 
-    // 5. Deduct Credit
     await supabase.from('profiles').update({ credits: profile.credits - 1 }).eq('id', user.id);
-
     res.status(200).json(JSON.parse(completion.choices[0]?.message?.content || "{}"));
   } catch (error: any) {
-    console.error("Backend Crash Caught:", error);
-    // This sends the EXACT error to the frontend alert box!
-    res.status(500).json({ error: error.message || "Unknown backend error occurred." });
+    console.error("API Error:", error);
+    res.status(500).json({ error: error.message || "Failed to organize" });
   }
 }
