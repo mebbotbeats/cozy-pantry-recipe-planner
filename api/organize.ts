@@ -22,8 +22,6 @@ export default async function handler(req: any, res: any) {
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !user) throw new Error("Invalid token.");
 
-    // NO CREDIT CHECK OR DEDUCTION HERE! Stocking shelves is FREE!
-
     const { input } = req.body;
     const completion = await groq.chat.completions.create({
       messages:[
@@ -38,15 +36,14 @@ export default async function handler(req: any, res: any) {
               {
                 "label": "Short handwritten label",
                 "originalName": "EXACTLY the name from user input",
-                "color": "#e5c49f", 
+                "color": "MUST VARY! Pick randomly from this list of cozy hex codes: #e5c49f, #d4a373, #a3b18a, #c08552, #ffa69e, #84a59d, #e9c46a, #e76f51, #cb997e", 
                 "size": "small", 
                 "shelf": 1
               }
             ]
           }
           Note: "size" MUST be exactly one of: "small", "medium", "tall", "wide", "large".
-          Note: "shelf" MUST be an integer from 1 to 5.
-          Note: "color" MUST be a valid hex code (muted warm colors).`
+          Note: "shelf" MUST be an integer from 1 to 5.`
         },
         { role: "user", content: input }
       ],

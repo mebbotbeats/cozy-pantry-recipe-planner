@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, ChefHat, RotateCcw, LogOut } from "lucide-react";
+import { Plus, ChefHat, RotateCcw, LogOut, Check } from "lucide-react";
 import { Ingredient, MealPlanResponse } from "./types";
 import { organizePantry, generateMealPlan } from "./services/aiService";
 import PantryShelf from "./components/PantryShelf";
@@ -19,14 +19,14 @@ const SHELF_LABELS: Record<number, string> = {
 
 export default function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const[isInputOpen, setIsInputOpen] = useState(false);
-  const[isPlanOpen, setIsPlanOpen] = useState(false);
+  const [isInputOpen, setIsInputOpen] = useState(false);
+  const [isPlanOpen, setIsPlanOpen] = useState(false);
   const[isOrganizing, setIsOrganizing] = useState(false);
-  const[mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
+  const [mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
 
   // --- MONETIZATION & AUTH STATE ---
-  const[user, setUser] = useState<User | null>(null);
-  const[credits, setCredits] = useState<number>(0);
+  const [user, setUser] = useState<User | null>(null);
+  const [credits, setCredits] = useState<number>(0);
 
   // Auth Listener
   useEffect(() => {
@@ -59,14 +59,14 @@ export default function App() {
         .single()
         .then(({ data }) => setCredits(data?.credits || 0));
     }
-  },[user, isOrganizing, mealPlan]);
+  }, [user, isOrganizing, mealPlan]);
 
   // Auth Handlers
   const handleLogin = async () => {
     await supabase.auth.signInWithOAuth({ 
       provider: "google",
       options: {
-        redirectTo: "https://pantryplanet.vercel.app/" 
+        redirectTo: window.location.origin 
       }
     });
   };
@@ -158,14 +158,15 @@ export default function App() {
     }
   };
 
-  const[isExporting, setIsExporting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const handleSaveRecipe = async () => {
     setIsExporting(true);
     try {
-      // FIX: Changed target from "app-root" to "pantry-capture-zone" to exclude the open modal!
+      // Captures only the pantry background, ignoring the open modal
       const pantryImg = await captureElement("pantry-capture-zone", "my-cozy-pantry");
       const images = [pantryImg].filter(Boolean) as string[];
 
+      // Captures the hidden, beautifully formatted recipe book
       const menuImg = await captureElement("meal-plan-canvas", "my-chef-menu");
       if (menuImg) images.push(menuImg);
 
@@ -183,11 +184,7 @@ export default function App() {
   return (
     <div id="app-root" className="h-screen w-screen overflow-hidden bg-[var(--pantry-bg)] relative">
       
-      {/* 
-        NEW CAPTURE ZONE: 
-        This wrapper holds only the pantry background, shelves, and buttons. 
-        Because the Modals are OUTSIDE this box, the screenshot tool ignores them!
-      */}
+      {/* CAPTURE ZONE: Holds the background, shelves, and buttons. Modals sit outside! */}
       <div id="pantry-capture-zone" className="h-full w-full flex flex-col relative">
         <div className="absolute inset-0 pointer-events-none z-40 carved-wall" />
 
@@ -294,38 +291,61 @@ export default function App() {
         isExporting={isExporting}
       />
 
-      {/* Hidden Export Buffer */}
+      {/* Hidden Export Buffer (The Beautiful Recipe Book) */}
       {mealPlan && (
         <div className="fixed -left-[2000px] top-0 pointer-events-none">
-          <div id="meal-plan-canvas" className="w-[800px] p-12 bg-[#faf8f1] rounded-2xl border border-[#d3c6aa]/30 space-y-8">
-            <div className="flex items-center gap-3 bg-[#4a5d4e] p-6 rounded-xl text-[#fdf6e3]">
-              <ChefHat className="w-8 h-8" />
-              <h2 className="handwriting text-4xl font-bold">Chef's Weekly Plan</h2>
+          <div id="meal-plan-canvas" className="w-[800px] p-12 bg-[#faf8f1] rounded-3xl border-4 border-[#e5c49f]/40 space-y-8 relative overflow-hidden">
+            {/* Paper Texture */}
+            <div className="absolute inset-0 opacity-[0.15] bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]" />
+            
+            <div className="relative z-10 flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <ChefHat className="w-12 h-12 text-[#84a59d]" />
+                <div className="flex flex-col">
+                  <h2 className="handwriting text-5xl font-bold text-[#5d4037] pt-2">Chef's Recipe Book</h2>
+                  <div className="w-32 h-1.5 bg-[#e5c49f] rounded-full mt-1" />
+                </div>
+              </div>
             </div>
-            <div className="italic text-xl text-center font-medium handwriting opacity-70 border-b border-[#d3c6aa]/30 pb-6">
+
+            <div className="relative z-10 italic text-2xl text-center font-medium handwriting opacity-80 text-[#84a59d] pb-6">
               "{mealPlan.encouragement}"
             </div>
-            {mealPlan.plan.map((day) => (
-              <div key={day.day} className="space-y-4">
-                <div className="flex items-baseline gap-4">
-                  <span className="text-4xl font-bold handwriting text-[#4a5d4e] opacity-30">Day {day.day}</span>
-                  <h3 className="text-2xl font-bold tracking-tight">{day.title}</h3>
+
+            <div className="relative z-10 grid gap-6">
+              {mealPlan.plan.map((day) => (
+                <div key={day.day} className="bg-white/60 p-6 rounded-2xl shadow-sm border border-[#e5c49f]/50 space-y-4">
+                  <div className="flex items-baseline gap-4 border-b border-[#e5c49f]/30 pb-3">
+                    <span className="text-3xl font-bold handwriting text-[#84a59d]">Day {day.day}</span>
+                    <h3 className="text-2xl font-bold text-[#5d4037] tracking-tight">{day.title}</h3>
+                  </div>
+                  <p className="text-base text-[#5d4037]/80 leading-relaxed italic px-2">
+                    {day.description}
+                  </p>
+                  <ul className="grid gap-3 pt-2">
+                    {day.instructions.map((step, i) => (
+                      <li key={i} className="flex gap-4 text-base text-[#5d4037]">
+                        <span className="mt-1 flex-shrink-0 bg-[#fdebd0] p-1.5 rounded-full">
+                          <Check className="w-4 h-4 text-[#c08552]" />
+                        </span>
+                        <span className="leading-relaxed font-medium">{step}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <p className="text-base opacity-70 leading-relaxed pl-4 border-l-2 border-[#d3c6aa]/30">
-                  {day.description}
-                </p>
-                <ul className="grid gap-3 pl-4">
-                  {day.instructions.map((step, i) => (
-                    <li key={i} className="flex gap-3 text-base">
-                      <span className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#4a5d4e]" />
-                      <span className="opacity-80">{step}</span>
-                    </li>
-                  ))}
-                </ul>
+              ))}
+            </div>
+
+            {/* Subtle Grocery Hint at the bottom (if needed) */}
+            {mealPlan.groceryHint && (
+              <div className="relative z-10 mt-8 bg-[#fdf6e3] p-6 rounded-2xl border-2 border-dashed border-[#a3b18a]/50 shadow-sm text-center">
+                <h4 className="font-bold text-[#5d4037] mb-2 uppercase tracking-wider text-sm">Chef's Complementary Note</h4>
+                <p className="text-base text-[#5d4037]/80 leading-relaxed italic">{mealPlan.groceryHint}</p>
               </div>
-            ))}
-            <div className="pt-8 text-center text-[10px] uppercase tracking-widest opacity-30 font-bold">
-              Generated by Cozy Pantry Canvas
+            )}
+
+            <div className="relative z-10 pt-8 text-center text-[11px] uppercase tracking-[0.2em] text-[#5d4037]/40 font-bold">
+              Generated by Pantry Canvas App
             </div>
           </div>
         </div>
