@@ -19,14 +19,24 @@ const SHELF_LABELS: Record<number, string> = {
 
 export default function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [isInputOpen, setIsInputOpen] = useState(false);
+  const[isInputOpen, setIsInputOpen] = useState(false);
   const [isPlanOpen, setIsPlanOpen] = useState(false);
-  const[isOrganizing, setIsOrganizing] = useState(false);
-  const [mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
+  const [isOrganizing, setIsOrganizing] = useState(false);
+  const[mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
 
   // --- MONETIZATION & AUTH STATE ---
   const [user, setUser] = useState<User | null>(null);
   const [credits, setCredits] = useState<number>(0);
+  const [particles] = useState(() => 
+    [...Array(15)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      width: `${Math.random() * 4 + 2}px`,
+      height: `${Math.random() * 4 + 2}px`,
+      animationDelay: `${Math.random() * 8}s`,
+      animationDuration: `${Math.random() * 5 + 6}s`
+    }))
+  );
 
   // Auth Listener
   useEffect(() => {
@@ -59,7 +69,7 @@ export default function App() {
         .single()
         .then(({ data }) => setCredits(data?.credits || 0));
     }
-  }, [user, isOrganizing, mealPlan]);
+  },[user, isOrganizing, mealPlan]);
 
   // Auth Handlers
   const handleLogin = async () => {
@@ -118,7 +128,7 @@ export default function App() {
     try {
       const newItems = await organizePantry(input);
       if (newItems.length > 0) {
-        setIngredients((prev) => [...prev, ...newItems]);
+        setIngredients((prev) =>[...prev, ...newItems]);
         setIsInputOpen(false);
       }
     } catch (error) {
@@ -185,8 +195,24 @@ export default function App() {
     <div id="app-root" className="h-screen w-screen overflow-hidden bg-[var(--pantry-bg)] relative">
       
       {/* CAPTURE ZONE: Holds the background, shelves, and buttons. Modals sit outside! */}
-      <div id="pantry-capture-zone" className="h-full w-full flex flex-col relative">
+      <div id="pantry-capture-zone" className="h-full w-full flex flex-col relative bg-[#d4b38e]/20">
+        
+        {/* The deep dark cabinet vignette */}
         <div className="absolute inset-0 pointer-events-none z-40 carved-wall" />
+        
+        {/* The Alpine Sunbeam */}
+        <div className="absolute inset-0 pointer-events-none sunbeam" />
+
+        {/* Floating Dust Particles */}
+        <div className="absolute inset-0 z-40 pointer-events-none overflow-hidden">
+          {particles.map((style, i) => (
+            <div 
+              key={i} 
+              className="dust-particle"
+              style={style}
+            />
+          ))}
+        </div>
 
         {/* Top Banner */}
         <header className="flex items-center justify-between p-2 px-10 shrink-0 z-[50]">
@@ -205,7 +231,7 @@ export default function App() {
                 Sign In
               </button>
             ) : (
-              <div className="flex items-center gap-3 bg-[#fdf6e3]/50 px-3 py-1.5 rounded-xl border border-[#5d4037]/10 shadow-sm">
+              <div className="flex items-center gap-3 bg-[#fdf6e3]/50 px-3 py-1.5 rounded-xl border border-[#5d4037]/10 shadow-sm backdrop-blur-sm">
                 <span className="handwriting text-lg font-bold text-[#5d4037]">Credits: {credits}</span>
                 {credits <= 2 && (
                   <button
@@ -240,7 +266,7 @@ export default function App() {
         </header>
 
         {/* Shelves Container */}
-        <main id="pantry-canvas" className="flex-1 flex flex-col overflow-hidden px-10">
+        <main id="pantry-canvas" className="flex-1 flex flex-col overflow-hidden px-10 z-[45]">
           {[1, 2, 3, 4, 5].map((shelfNum) => (
             <PantryShelf
               key={shelfNum}

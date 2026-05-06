@@ -13,12 +13,12 @@ interface PantryShelfProps {
 export default function PantryShelf({ shelfNumber, label, ingredients, onRemove }: PantryShelfProps) {
   return (
     <div className="flex-1 flex flex-col min-h-0 min-w-0 relative group border-b border-black/5 pb-2">
-      {/* Subtle shelf background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/[0.02] to-transparent pointer-events-none" />
+      {/* Subtle shelf background gradient to give it a slight recess feel */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/[0.03] to-transparent pointer-events-none" />
       
-      {/* Label placed within shelf space */}
+      {/* Label placed within shelf space with a vintage aesthetic */}
       <div className="absolute top-1 left-4 z-20">
-        <span className="text-[9px] uppercase tracking-[0.2em] text-[#5d4037]/30 font-bold">
+        <span className="text-[9px] uppercase tracking-[0.25em] text-[#5d4037]/40 font-bold bg-white/30 px-1.5 py-0.5 rounded-sm">
            {label}
         </span>
       </div>
@@ -37,21 +37,32 @@ export default function PantryShelf({ shelfNumber, label, ingredients, onRemove 
               ))}
             </AnimatePresence>
             {ingredients.length === 0 && (
-              <div className="h-14 flex items-center px-4 opacity-5 italic text-[10px] text-[#5d4037] uppercase tracking-widest">
-                Empty shelf
+              <div className="h-14 flex items-center px-4 opacity-10 italic text-[10px] text-[#5d4037] uppercase tracking-widest">
+                — waiting for ingredients —
               </div>
             )}
           </div>
         </div>
         
-        {/* The Wooden Board Floor (Perspective View) */}
-        <div className="h-4 w-full bg-[#e5c49f]/60 relative z-0 border-t border-black/5">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
-          {/* Front Edge of the Board - Slightly darker */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#d4b38e] border-t border-black/5" />
+        {/* The Wooden Board Floor (Rustic Alpine Cottage Style) */}
+        <div 
+          className="h-5 w-full relative z-0 border-t border-[#8b5a2b]/30 shadow-inner" 
+          style={{ 
+            backgroundColor: "#b58b5e", 
+            backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" 
+          }}
+        >
+          {/* Top highlight for sunlight hitting the edge */}
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/20" />
           
-          {/* Shadow Under the Shelf Board */}
-          <div className="absolute -bottom-3 left-0 right-0 h-3 bg-gradient-to-b from-black/10 to-transparent pointer-events-none z-[-1]" />
+          {/* Front Edge of the Board - Darker thickness for depth */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-2 bg-[#8b5a2b] border-t border-[#5c3a21]/40" 
+            style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" }} 
+          />
+          
+          {/* Heavy Cast Shadow Under the Shelf to make it pop off the background */}
+          <div className="absolute -bottom-6 left-0 right-0 h-6 bg-gradient-to-b from-[rgba(62,39,35,0.4)] to-transparent pointer-events-none z-[-1]" />
         </div>
       </div>
     </div>
