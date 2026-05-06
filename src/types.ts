@@ -19,7 +19,7 @@ export interface MealPlanDay {
 export interface MealPlanResponse {
   plan: MealPlanDay[];
   encouragement: string;
-  shoppingList: string[]; // NEW: The missing ingredients to buy!
+  groceryHint?: string; // Small optional hint at the end
 }
 
 export interface PantryOrganizeResponse {

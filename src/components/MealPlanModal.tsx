@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { X, ChefHat, Check, ShoppingCart } from "lucide-react";
+import { X, ChefHat, Check, ShoppingBasket } from "lucide-react";
 import { MealPlanResponse } from "../types";
 
 interface Props {
@@ -22,12 +22,12 @@ export default function MealPlanModal({ isOpen, onClose, mealPlan }: Props) {
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="w-full max-w-3xl max-h-[85vh] bg-[#faf8f1] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-[#d3c6aa]/30"
+            className="w-full max-w-2xl max-h-[85vh] bg-[#faf8f1] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-[#d3c6aa]/30"
           >
             <div className="bg-[#4a5d4e] p-6 flex items-center justify-between text-[#fdf6e3]">
               <div className="flex items-center gap-3">
                 <ChefHat className="w-8 h-8" />
-                <h2 className="handwriting text-3xl font-bold">Chef's Master 7-Day Plan</h2>
+                <h2 className="handwriting text-3xl font-bold">Chef's 3-Day Plan</h2>
               </div>
               <button 
                 onClick={onClose}
@@ -44,26 +44,6 @@ export default function MealPlanModal({ isOpen, onClose, mealPlan }: Props) {
                     "{mealPlan.encouragement}"
                   </div>
 
-                  {/* NEW: Shopping List Section */}
-                  {mealPlan.shoppingList && mealPlan.shoppingList.length > 0 && (
-                    <div className="bg-[#e5c49f]/30 p-6 rounded-xl border border-[#d3c6aa]/50">
-                      <div className="flex items-center gap-2 mb-3 text-[#5d4037]">
-                        <ShoppingCart className="w-5 h-5" />
-                        <h3 className="font-bold text-lg tracking-tight">Missing Ingredient List</h3>
-                      </div>
-                      <p className="text-sm opacity-70 mb-3">Buy these 3 items to turn your pantry into a gourmet kitchen this week:</p>
-                      <ul className="grid gap-2 pl-2">
-                        {mealPlan.shoppingList.map((item, i) => (
-                          <li key={i} className="flex gap-3 text-sm font-medium text-[#5d4037]">
-                            <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#4a5d4e]" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* 7-Day Meal Plan */}
                   <div className="grid gap-8 mt-6">
                     {mealPlan.plan.map((day) => (
                       <div key={day.day} className="space-y-4">
@@ -80,7 +60,6 @@ export default function MealPlanModal({ isOpen, onClose, mealPlan }: Props) {
                               <span className="mt-1 flex-shrink-0">
                                   <Check className="w-4 h-4 text-[#4a5d4e]" />
                               </span>
-                              {/* Renders Breakfast, Lunch, and Dinner! */}
                               <span className="opacity-80 leading-relaxed">{step}</span> 
                             </li>
                           ))}
@@ -88,11 +67,22 @@ export default function MealPlanModal({ isOpen, onClose, mealPlan }: Props) {
                       </div>
                     ))}
                   </div>
+
+                  {/* Subtle Grocery Hint at the bottom */}
+                  {mealPlan.groceryHint && (
+                    <div className="mt-8 bg-[#e5c49f]/30 p-5 rounded-xl border border-[#d3c6aa]/50 flex gap-4 items-start">
+                      <ShoppingBasket className="w-6 h-6 text-[#5d4037] flex-shrink-0 mt-1" />
+                      <div>
+                        <h4 className="font-bold text-[#5d4037] mb-1">Chef's Complementary Note</h4>
+                        <p className="text-sm text-[#5d4037]/80 leading-relaxed">{mealPlan.groceryHint}</p>
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-20 opacity-30">
                   <ChefHat className="w-16 h-16 mb-4 animate-bounce" />
-                  <p className="handwriting text-2xl">Chef is drafting your 7-day menu...</p>
+                  <p className="handwriting text-2xl">Chef is thinking...</p>
                 </div>
               )}
             </div>

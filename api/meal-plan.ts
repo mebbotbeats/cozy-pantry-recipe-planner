@@ -22,6 +22,7 @@ export default async function handler(req: any, res: any) {
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !user) throw new Error("Invalid token.");
 
+    // Check Credits! Must have > 0 to consult the Chef.
     const { data: profile } = await supabase.from('profiles').select('credits').eq('id', user.id).single();
     if (!profile || profile.credits <= 0) return res.status(403).json({ error: "OUT_OF_CREDITS" });
 
@@ -32,32 +33,44 @@ export default async function handler(req: any, res: any) {
       messages:[
          { 
            role: "system", 
-           content: `You are a Master Home Chef. Create a 7-DAY meal plan based on the ingredients provided.
+           content: `You are a cozy, encouraging home chef. Create a practical 3-DAY meal plan based STRICTLY on the list of ingredients provided.
            STRICT RULES:
-           1. Use the provided ingredients creatively.
-           2. Create a "Shopping List" of 3 to 4 specific items the user SHOULD buy at the store to turn these random ingredients into gourmet meals.
-           3. The "instructions" array MUST contain exactly 3 strings formatted as "Breakfast: [meal]", "Lunch: [meal]", and "Dinner: [meal]".
+           1. BLINDLY FOLLOW the ingredient list. ONLY use what the user provided. Do NOT assume any staples (like oil, salt, butter) exist unless listed.
+           2. Focus on ONE main meal or snack per day for exactly 3 days.
+           3. GROCERY HINT: Only if absolutely necessary to make the meals complete, suggest 1 to 3 highlighted groceries they can easily grab to complement the meals. Put this in the "groceryHint" field. If not needed, leave it empty.
            4. You MUST return valid JSON exactly matching this structure:
            {
              "encouragement": "A friendly string here",
-             "shoppingList": ["Item 1", "Item 2", "Item 3"],
+             "groceryHint": "Optional: Small string suggesting 1-3 complimentary items to buy, or leave blank.",
              "plan":[
                {
                  "day": 1,
                  "title": "String title",
                  "description": "Short string description",
-                 "instructions": ["Breakfast: ...", "Lunch: ...", "Dinner: ..."]
+                 "instructions": ["Step 1", "Step 2", "Step 3"]
                },
-               // ... Continue this pattern exactly for days 2, 3, 4, 5, 6, and 7
+               {
+                 "day": 2,
+                 "title": "String title",
+                 "description": "Short string description",
+                 "instructions": ["Step 1", "Step 2", "Step 3"]
+               },
+               {
+                 "day": 3,
+                 "title": "String title",
+                 "description": "Short string description",
+                 "instructions":["Step 1", "Step 2", "Step 3"]
+               }
              ]
            }`
          },
          { role: "user", content: `Ingredients: ${list}` }
       ],
-      model: "openai/gpt-oss-120b", 
+      model: "openai/gpt-oss-120b",
       response_format: { type: "json_object" }
     });
 
+    // Deduct 1 Credit for using the Chef
     await supabase.from('profiles').update({ credits: profile.credits - 1 }).eq('id', user.id);
     
     res.status(200).json(JSON.parse(completion.choices[0]?.message?.content || "{}"));
