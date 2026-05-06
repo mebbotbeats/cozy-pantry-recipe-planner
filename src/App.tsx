@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, ChefHat, RotateCcw, Share2, LogOut } from "lucide-react";
+import { Plus, ChefHat, RotateCcw, LogOut } from "lucide-react";
 import { Ingredient, MealPlanResponse } from "./types";
 import { organizePantry, generateMealPlan } from "./services/aiService";
 import PantryShelf from "./components/PantryShelf";
@@ -20,7 +20,7 @@ const SHELF_LABELS: Record<number, string> = {
 export default function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const[isInputOpen, setIsInputOpen] = useState(false);
-  const [isPlanOpen, setIsPlanOpen] = useState(false);
+  const[isPlanOpen, setIsPlanOpen] = useState(false);
   const [isOrganizing, setIsOrganizing] = useState(false);
   const[mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
 
@@ -66,8 +66,6 @@ export default function App() {
     await supabase.auth.signInWithOAuth({ 
       provider: "google",
       options: {
-        // This forces Supabase to send you back to exactly where you clicked "Sign In"
-        // whether that is localhost or your live Vercel site!
         redirectTo: "https://pantryplanet.vercel.app/" 
       }
     });
@@ -161,7 +159,7 @@ export default function App() {
   };
 
   const[isExporting, setIsExporting] = useState(false);
-  const handleShare = async () => {
+  const handleSaveRecipe = async () => {
     setIsExporting(true);
     try {
       const pantryImg = await captureElement("app-root", "my-cozy-pantry");
@@ -172,7 +170,7 @@ export default function App() {
 
       const shared = await shareImages(images, "Check out my pantry setup and chef-curated menu!");
       if (!shared) {
-        alert("Aesthetic captures saved! Check your downloads.");
+        alert("Aesthetic recipe captures saved! Check your device downloads/photos.");
       }
     } catch (err) {
       console.error(err);
@@ -226,16 +224,8 @@ export default function App() {
           {/* Utility Buttons */}
           <div className="flex gap-1 ml-2">
             <button
-              onClick={handleShare}
-              disabled={isExporting}
-              className="p-2 rounded-full hover:bg-black/5 text-[#5d4037]/40 hover:text-[#5d4037] transition-all"
-              title="Share My Week"
-            >
-              <Share2 className={`w-4 h-4 ${isExporting ? "animate-pulse" : ""}`} />
-            </button>
-            <button
               onClick={clearPantry}
-              className="p-2 rounded-full hover:bg-black/5 text-[#5d4037]/20 hover:text-[#5d4037] transition-all"
+              className="p-2 rounded-full hover:bg-black/5 text-[#5d4037]/40 hover:text-[#5d4037] transition-all"
               title="Clear Pantry"
             >
               <RotateCcw className="w-4 h-4" />
@@ -291,6 +281,8 @@ export default function App() {
         isOpen={isPlanOpen}
         onClose={() => setIsPlanOpen(false)}
         mealPlan={mealPlan}
+        onSave={handleSaveRecipe}
+        isExporting={isExporting}
       />
 
       {/* Hidden Export Buffer */}

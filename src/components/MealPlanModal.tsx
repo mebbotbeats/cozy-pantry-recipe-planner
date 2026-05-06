@@ -1,14 +1,16 @@
 import { motion, AnimatePresence } from "motion/react";
-import { X, ChefHat, Check, ShoppingBasket } from "lucide-react";
+import { X, ChefHat, Check, ShoppingBasket, Download } from "lucide-react";
 import { MealPlanResponse } from "../types";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   mealPlan: MealPlanResponse | null;
+  onSave: () => void;
+  isExporting: boolean;
 }
 
-export default function MealPlanModal({ isOpen, onClose, mealPlan }: Props) {
+export default function MealPlanModal({ isOpen, onClose, mealPlan, onSave, isExporting }: Props) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -16,13 +18,13 @@ export default function MealPlanModal({ isOpen, onClose, mealPlan }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm"
         >
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className="w-full max-w-2xl max-h-[85vh] bg-[#faf8f1] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-[#d3c6aa]/30"
+            className="w-full max-w-2xl max-h-[90vh] bg-[#faf8f1] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-[#d3c6aa]/30"
           >
             <div className="bg-[#4a5d4e] p-6 flex items-center justify-between text-[#fdf6e3]">
               <div className="flex items-center gap-3">
@@ -87,13 +89,38 @@ export default function MealPlanModal({ isOpen, onClose, mealPlan }: Props) {
               )}
             </div>
             
-            <div className="p-6 bg-[#fdf6e3] border-t border-[#d3c6aa]/20 flex justify-center">
-                <button 
-                    onClick={onClose}
-                    className="px-8 py-3 bg-[#4a5d4e] text-[#fdf6e3] rounded-xl font-bold shadow-md hover:shadow-lg transition-all active:scale-95"
-                >
-                    Close Menu
-                </button>
+            {/* NEW FOOTER: Call to Action */}
+            <div className="p-4 sm:p-6 bg-[#fdf6e3] border-t border-[#d3c6aa]/30 flex flex-col items-center">
+                
+                {mealPlan && (
+                  <div className="w-full bg-red-900/5 border border-red-900/10 text-red-900/80 px-4 py-2 rounded-lg mb-4 text-xs sm:text-sm text-center shadow-sm">
+                      <span className="font-bold uppercase tracking-widest text-[10px] text-red-900 block mb-0.5">⚠️ Wait!</span>
+                      These recipes will vanish when you close this window.
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+                    <button 
+                        onClick={onClose}
+                        className="px-6 py-3 text-[#5d4037]/60 hover:text-[#5d4037] hover:bg-black/5 rounded-xl font-bold transition-all order-2 sm:order-1"
+                    >
+                        Close without saving
+                    </button>
+                    
+                    <button 
+                        onClick={onSave}
+                        disabled={isExporting || !mealPlan}
+                        className={`
+                          px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 order-1 sm:order-2
+                          ${!mealPlan || isExporting 
+                            ? "bg-black/10 text-black/40 cursor-not-allowed" 
+                            : "bg-[#4a5d4e] text-[#fdf6e3]"}
+                        `}
+                    >
+                        <Download className={`w-5 h-5 ${isExporting ? "animate-bounce" : ""}`} />
+                        {isExporting ? "Saving Images..." : "Save Recipe to Device"}
+                    </button>
+                </div>
             </div>
           </motion.div>
         </motion.div>
