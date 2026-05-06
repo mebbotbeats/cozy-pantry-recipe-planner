@@ -21,11 +21,11 @@ export default function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const[isInputOpen, setIsInputOpen] = useState(false);
   const[isPlanOpen, setIsPlanOpen] = useState(false);
-  const [isOrganizing, setIsOrganizing] = useState(false);
+  const[isOrganizing, setIsOrganizing] = useState(false);
   const[mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
 
   // --- MONETIZATION & AUTH STATE ---
-  const [user, setUser] = useState<User | null>(null);
+  const[user, setUser] = useState<User | null>(null);
   const[credits, setCredits] = useState<number>(0);
 
   // Auth Listener
@@ -162,7 +162,8 @@ export default function App() {
   const handleSaveRecipe = async () => {
     setIsExporting(true);
     try {
-      const pantryImg = await captureElement("app-root", "my-cozy-pantry");
+      // FIX: Changed target from "app-root" to "pantry-capture-zone" to exclude the open modal!
+      const pantryImg = await captureElement("pantry-capture-zone", "my-cozy-pantry");
       const images = [pantryImg].filter(Boolean) as string[];
 
       const menuImg = await captureElement("meal-plan-canvas", "my-chef-menu");
@@ -180,96 +181,104 @@ export default function App() {
   };
 
   return (
-    <div id="app-root" className="h-screen w-screen overflow-hidden flex flex-col bg-[var(--pantry-bg)] relative">
-      <div className="absolute inset-0 pointer-events-none z-40 carved-wall" />
+    <div id="app-root" className="h-screen w-screen overflow-hidden bg-[var(--pantry-bg)] relative">
+      
+      {/* 
+        NEW CAPTURE ZONE: 
+        This wrapper holds only the pantry background, shelves, and buttons. 
+        Because the Modals are OUTSIDE this box, the screenshot tool ignores them!
+      */}
+      <div id="pantry-capture-zone" className="h-full w-full flex flex-col relative">
+        <div className="absolute inset-0 pointer-events-none z-40 carved-wall" />
 
-      {/* Top Banner */}
-      <header className="flex items-center justify-between p-2 px-10 shrink-0 z-[50]">
-        <div className="flex items-baseline gap-3">
-          <h1 className="handwriting text-3xl font-bold text-[#5d4037] drop-shadow-sm">Pantry Canvas</h1>
-          <p className="text-[8px] uppercase tracking-[0.3em] text-[#5d4037]/40 font-bold hidden sm:block">The Art of the Ingredient</p>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {/* AUTH & CREDITS UI */}
-          {!user ? (
-            <button
-              onClick={handleLogin}
-              className="px-4 py-1.5 bg-[#5d4037] text-[#fdf6e3] rounded-lg font-bold text-sm shadow-sm hover:scale-105 active:scale-95 transition-all"
-            >
-              Sign In
-            </button>
-          ) : (
-            <div className="flex items-center gap-3 bg-[#fdf6e3]/50 px-3 py-1.5 rounded-xl border border-[#5d4037]/10 shadow-sm">
-              <span className="handwriting text-lg font-bold text-[#5d4037]">Credits: {credits}</span>
-              {credits <= 2 && (
-                <button
-                  onClick={handleRefill}
-                  className="text-xs bg-[#e5c49f] text-[#5d4037] px-3 py-1 rounded-md shadow-sm hover:scale-105 active:scale-95 font-bold transition-all"
-                >
-                  Refill ($5)
-                </button>
-              )}
-              <div className="w-px h-4 bg-[#5d4037]/20 mx-1" />
-              <button 
-                onClick={handleLogout} 
-                className="text-[#5d4037]/50 hover:text-[#5d4037] transition-colors"
-                title="Log out"
+        {/* Top Banner */}
+        <header className="flex items-center justify-between p-2 px-10 shrink-0 z-[50]">
+          <div className="flex items-baseline gap-3">
+            <h1 className="handwriting text-3xl font-bold text-[#5d4037] drop-shadow-sm">Pantry Canvas</h1>
+            <p className="text-[8px] uppercase tracking-[0.3em] text-[#5d4037]/40 font-bold hidden sm:block">The Art of the Ingredient</p>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            {/* AUTH & CREDITS UI */}
+            {!user ? (
+              <button
+                onClick={handleLogin}
+                className="px-4 py-1.5 bg-[#5d4037] text-[#fdf6e3] rounded-lg font-bold text-sm shadow-sm hover:scale-105 active:scale-95 transition-all"
               >
-                <LogOut className="w-4 h-4" />
+                Sign In
+              </button>
+            ) : (
+              <div className="flex items-center gap-3 bg-[#fdf6e3]/50 px-3 py-1.5 rounded-xl border border-[#5d4037]/10 shadow-sm">
+                <span className="handwriting text-lg font-bold text-[#5d4037]">Credits: {credits}</span>
+                {credits <= 2 && (
+                  <button
+                    onClick={handleRefill}
+                    className="text-xs bg-[#e5c49f] text-[#5d4037] px-3 py-1 rounded-md shadow-sm hover:scale-105 active:scale-95 font-bold transition-all"
+                  >
+                    Refill ($5)
+                  </button>
+                )}
+                <div className="w-px h-4 bg-[#5d4037]/20 mx-1" />
+                <button 
+                  onClick={handleLogout} 
+                  className="text-[#5d4037]/50 hover:text-[#5d4037] transition-colors"
+                  title="Log out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Utility Buttons */}
+            <div className="flex gap-1 ml-2">
+              <button
+                onClick={clearPantry}
+                className="p-2 rounded-full hover:bg-black/5 text-[#5d4037]/40 hover:text-[#5d4037] transition-all"
+                title="Clear Pantry"
+              >
+                <RotateCcw className="w-4 h-4" />
               </button>
             </div>
-          )}
-
-          {/* Utility Buttons */}
-          <div className="flex gap-1 ml-2">
-            <button
-              onClick={clearPantry}
-              className="p-2 rounded-full hover:bg-black/5 text-[#5d4037]/40 hover:text-[#5d4037] transition-all"
-              title="Clear Pantry"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Shelves Container */}
-      <main id="pantry-canvas" className="flex-1 flex flex-col overflow-hidden px-10">
-        {[1, 2, 3, 4, 5].map((shelfNum) => (
-          <PantryShelf
-            key={shelfNum}
-            shelfNumber={shelfNum}
-            label={SHELF_LABELS[shelfNum]}
-            ingredients={ingredients.filter((i) => i.shelf === shelfNum || (shelfNum === 5 && (i.shelf > 5 || i.shelf < 1)))}
-            onRemove={handleRemove}
-          />
-        ))}
-      </main>
+        {/* Shelves Container */}
+        <main id="pantry-canvas" className="flex-1 flex flex-col overflow-hidden px-10">
+          {[1, 2, 3, 4, 5].map((shelfNum) => (
+            <PantryShelf
+              key={shelfNum}
+              shelfNumber={shelfNum}
+              label={SHELF_LABELS[shelfNum]}
+              ingredients={ingredients.filter((i) => i.shelf === shelfNum || (shelfNum === 5 && (i.shelf > 5 || i.shelf < 1)))}
+              onRemove={handleRemove}
+            />
+          ))}
+        </main>
 
-      {/* Footer Buttons */}
-      <footer className="h-24 flex items-center justify-center gap-4 px-6 relative z-[50] shrink-0">
-        <button
-          onClick={() => {
-            if (!user) alert("Please sign in to stock your shelves!");
-            else setIsInputOpen(true);
-          }}
-          className="flex items-center gap-2 bg-[#5d4037] text-[#fdf6e3] px-8 py-3 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all font-bold group"
-        >
-          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-          <span className="handwriting text-lg">Stock Shelves</span>
-        </button>
+        {/* Footer Buttons */}
+        <footer className="h-24 flex items-center justify-center gap-4 px-6 relative z-[50] shrink-0">
+          <button
+            onClick={() => {
+              if (!user) alert("Please sign in to stock your shelves!");
+              else setIsInputOpen(true);
+            }}
+            className="flex items-center gap-2 bg-[#5d4037] text-[#fdf6e3] px-8 py-3 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all font-bold group"
+          >
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+            <span className="handwriting text-lg">Stock Shelves</span>
+          </button>
 
-        <button
-          onClick={handleGeneratePlan}
-          className="flex items-center gap-2 bg-[#e5c49f] text-[#5d4037] px-8 py-3 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all font-bold"
-        >
-          <ChefHat className="w-5 h-5" />
-          <span className="handwriting text-lg">Consult Chef</span>
-        </button>
-      </footer>
+          <button
+            onClick={handleGeneratePlan}
+            className="flex items-center gap-2 bg-[#e5c49f] text-[#5d4037] px-8 py-3 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all font-bold"
+          >
+            <ChefHat className="w-5 h-5" />
+            <span className="handwriting text-lg">Consult Chef</span>
+          </button>
+        </footer>
+      </div>
 
-      {/* Overlays */}
+      {/* OVERLAYS (Outside of capture zone) */}
       <PantryInput
         isOpen={isInputOpen}
         onClose={() => setIsInputOpen(false)}
