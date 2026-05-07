@@ -82,10 +82,10 @@ export default function PantryShelf({ label, ingredients, onRemove }: PantryShel
 
             {/* HEAVY CAST SHADOWS (Now fully visible because the wrapper is 150px tall!) */}
             {/* Sharp, dark contact shadow right underneath the wood */}
-            <div className="h-5 w-full bg-gradient-to-b from-[rgba(62,39,35,0.7)] to-transparent" />
+            <div className="h-5 w-full bg-gradient-to-b from-[rgba(62,39,35,0.5)] to-transparent" />
             
             {/* Wide, diffuse ambient drop shadow spreading down the wall */}
-            <div className="absolute top-[16px] sm:top-[20px] left-0 right-0 h-24 sm:h-32 bg-gradient-to-b from-[rgba(62,39,35,0.25)] via-[rgba(62,39,35,0.06)] to-transparent" />
+            <div className="absolute top-[16px] sm:top-[20px] left-0 right-0 h-24 sm:h-32 bg-gradient-to-b from-[rgba(62,39,35,0.15)] via-[rgba(62,39,35,0.03)] to-transparent" />
           </div>
         </div>
 
