@@ -9,20 +9,12 @@ import { captureElement, shareImages } from "./lib/share";
 import { supabase } from "./lib/supabase";
 import { User } from "@supabase/supabase-js";
 
-const SHELF_LABELS: Record<number, string> = {
-  1: "Spices & Dry Goods",
-  2: "Canned & Jars",
-  3: "Fresh & Produce",
-  4: "Baking & Grains",
-  5: "Miscellaneous",
-};
-
 export default function App() {
   const[ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [isPlanOpen, setIsPlanOpen] = useState(false);
   const[isOrganizing, setIsOrganizing] = useState(false);
-  const [mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
+  const[mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
 
   const [user, setUser] = useState<User | null>(null);
   const [credits, setCredits] = useState<number>(0);
@@ -138,7 +130,6 @@ export default function App() {
   return (
     <div id="app-root" className="h-screen w-screen overflow-hidden bg-[var(--pantry-bg)] flex flex-col relative">
       
-      {/* CAPTURE ZONE - Added min-h-0 to enforce strict vertical fit */}
       <div id="pantry-capture-zone" className="flex-1 w-full flex flex-col relative bokeh-glow min-h-0">
         
         <div className="absolute inset-0 pointer-events-none z-40 carved-wall" />
@@ -150,7 +141,6 @@ export default function App() {
           ))}
         </div>
 
-        {/* Header - Added shrink-0 */}
         <header className="flex items-center justify-between p-3 sm:p-4 px-6 sm:px-10 shrink-0 z-[50]">
           <div className="flex items-baseline gap-3">
             <h1 className="handwriting text-3xl sm:text-4xl font-bold text-[#5d4037] drop-shadow-sm">PantryPlanet</h1>
@@ -184,20 +174,18 @@ export default function App() {
           </div>
         </header>
 
-        {/* Shelves Container - flex-1 min-h-0 perfectly squishes the shelves evenly */}
         <main id="pantry-canvas" className="flex-1 flex flex-col px-4 sm:px-10 z-[45] pb-2 min-h-0">
+          {/* We now just map blank shelves and pass the filtered ingredients to them! */}
           {[1, 2, 3, 4, 5].map((shelfNum) => (
             <PantryShelf
               key={shelfNum}
               shelfNumber={shelfNum}
-              label={SHELF_LABELS[shelfNum]}
               ingredients={ingredients.filter((i) => i.shelf === shelfNum || (shelfNum === 5 && (i.shelf > 5 || i.shelf < 1)))}
               onRemove={handleRemove}
             />
           ))}
         </main>
 
-        {/* Footer Buttons - Added shrink-0 so they NEVER get pushed off-screen */}
         <footer className="h-16 sm:h-24 flex items-center justify-center gap-3 sm:gap-4 px-6 relative z-[50] shrink-0 pb-2 sm:pb-0">
           <button onClick={() => { if (!user) alert("Please sign in to stock your shelves!"); else setIsInputOpen(true); }} className="flex items-center gap-2 bg-[#5d4037] text-[#fdf6e3] px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all font-bold group">
             <Plus className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-90 transition-transform" />
@@ -213,13 +201,10 @@ export default function App() {
       <PantryInput isOpen={isInputOpen} onClose={() => setIsInputOpen(false)} onSubmit={handleOrganize} isLoading={isOrganizing} />
       <MealPlanModal isOpen={isPlanOpen} onClose={() => setIsPlanOpen(false)} mealPlan={mealPlan} onSave={handleSaveRecipe} isExporting={isExporting} />
       
-      {/* Hidden Export Buffer (The Beautiful Recipe Book) */}
       {mealPlan && (
         <div className="fixed -left-[2000px] top-0 pointer-events-none">
           <div id="meal-plan-canvas" className="w-[800px] p-12 bg-[#faf8f1] rounded-3xl border-4 border-[#e5c49f]/40 space-y-8 relative overflow-hidden">
-            {/* Paper Texture */}
             <div className="absolute inset-0 opacity-[0.15] bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]" />
-            
             <div className="relative z-10 flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <ChefHat className="w-12 h-12 text-[#84a59d]" />
@@ -229,11 +214,7 @@ export default function App() {
                 </div>
               </div>
             </div>
-
-            <div className="relative z-10 italic text-2xl text-center font-medium handwriting opacity-80 text-[#84a59d] pb-6">
-              "{mealPlan.encouragement}"
-            </div>
-
+            <div className="relative z-10 italic text-2xl text-center font-medium handwriting opacity-80 text-[#84a59d] pb-6">"{mealPlan.encouragement}"</div>
             <div className="relative z-10 grid gap-6">
               {mealPlan.plan.map((day) => (
                 <div key={day.day} className="bg-white/60 p-6 rounded-2xl shadow-sm border border-[#e5c49f]/50 space-y-4">
@@ -241,15 +222,11 @@ export default function App() {
                     <span className="text-3xl font-bold handwriting text-[#84a59d]">Day {day.day}</span>
                     <h3 className="text-2xl font-bold text-[#5d4037] tracking-tight">{day.title}</h3>
                   </div>
-                  <p className="text-base text-[#5d4037]/80 leading-relaxed italic px-2">
-                    {day.description}
-                  </p>
+                  <p className="text-base text-[#5d4037]/80 leading-relaxed italic px-2">{day.description}</p>
                   <ul className="grid gap-3 pt-2">
                     {day.instructions.map((step, i) => (
                       <li key={i} className="flex gap-4 text-base text-[#5d4037]">
-                        <span className="mt-1 flex-shrink-0 bg-[#fdebd0] p-1.5 rounded-full">
-                          <Check className="w-4 h-4 text-[#c08552]" />
-                        </span>
+                        <span className="mt-1 flex-shrink-0 bg-[#fdebd0] p-1.5 rounded-full"><Check className="w-4 h-4 text-[#c08552]" /></span>
                         <span className="leading-relaxed font-medium">{step}</span>
                       </li>
                     ))}
@@ -257,18 +234,13 @@ export default function App() {
                 </div>
               ))}
             </div>
-
-            {/* Subtle Grocery Hint at the bottom (if needed) */}
             {mealPlan.groceryHint && (
               <div className="relative z-10 mt-8 bg-[#fdf6e3] p-6 rounded-2xl border-2 border-dashed border-[#a3b18a]/50 shadow-sm text-center">
                 <h4 className="font-bold text-[#5d4037] mb-2 uppercase tracking-wider text-sm">Chef's Complementary Note</h4>
                 <p className="text-base text-[#5d4037]/80 leading-relaxed italic">{mealPlan.groceryHint}</p>
               </div>
             )}
-
-            <div className="relative z-10 pt-8 text-center text-[11px] uppercase tracking-[0.2em] text-[#5d4037]/40 font-bold">
-              Generated by PantryPlanet
-            </div>
+            <div className="relative z-10 pt-8 text-center text-[11px] uppercase tracking-[0.2em] text-[#5d4037]/40 font-bold">Generated by PantryPlanet</div>
           </div>
         </div>
       )}

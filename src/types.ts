@@ -7,6 +7,7 @@ export interface Ingredient {
   color: string;
   size: IngredientSize;
   shelf: number; // 1 to 5
+  group: string; // Dynamic cluster name (e.g., "Coffee Bar", "Baking")
 }
 
 export interface MealPlanDay {
@@ -19,7 +20,7 @@ export interface MealPlanDay {
 export interface MealPlanResponse {
   plan: MealPlanDay[];
   encouragement: string;
-  groceryHint?: string; // Small optional hint at the end
+  groceryHint?: string;
 }
 
 export interface PantryOrganizeResponse {

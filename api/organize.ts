@@ -36,14 +36,16 @@ export default async function handler(req: any, res: any) {
               {
                 "label": "Short handwritten label",
                 "originalName": "EXACTLY the name from user input",
-                "color": "MUST VARY! Pick randomly from this list of cozy hex codes: #e5c49f, #d4a373, #a3b18a, #c08552, #ffa69e, #84a59d, #e9c46a, #e76f51, #cb997e", 
+                "color": "MUST VARY! Pick randomly from this list: #e5c49f, #d4a373, #a3b18a, #c08552, #ffa69e, #84a59d, #e9c46a, #e76f51, #cb997e", 
                 "size": "small", 
-                "shelf": 1
+                "shelf": 1,
+                "group": "Baking"
               }
             ]
           }
           Note: "size" MUST be exactly one of: "small", "medium", "tall", "wide", "large".
-          Note: "shelf" MUST be an integer from 1 to 5.`
+          Note: "shelf" MUST be an integer from 1 to 5.
+          Note: "group" MUST be a short, aesthetic category name (e.g., "Coffee Bar", "Spices", "Pasta Night"). Items with the same group will sit side-by-side!`
         },
         { role: "user", content: input }
       ],
