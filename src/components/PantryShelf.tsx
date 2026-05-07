@@ -11,21 +11,23 @@ interface PantryShelfProps {
 
 export default function PantryShelf({ shelfNumber, label, ingredients, onRemove }: PantryShelfProps) {
   return (
-    <div className="flex-1 flex flex-col min-h-0 min-w-0 relative group border-b border-black/5 pb-2">
-      {/* Subtle shelf background gradient to give it a slight recess feel */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/[0.03] to-transparent pointer-events-none" />
+    // Changed to overflow-visible and z-[1] so shadows do not get clipped!
+    <div className="flex-1 flex flex-col relative overflow-visible z-[1] group pb-4">
       
-      {/* Label placed within shelf space with a vintage aesthetic */}
-      <div className="absolute top-1 left-4 z-20">
-        <span className="text-[9px] uppercase tracking-[0.25em] text-[#5d4037]/40 font-bold bg-white/30 px-1.5 py-0.5 rounded-sm">
+      {/* Label placed within shelf space with a bright, vintage aesthetic */}
+      <div className="absolute top-0 left-6 z-20">
+        <span className="text-[10px] uppercase tracking-[0.2em] text-[#8c7a6b] font-bold bg-[#fdf6e3]/60 px-2 py-0.5 rounded-sm backdrop-blur-sm shadow-sm border border-white/50">
            {label}
         </span>
       </div>
 
-      <div className="flex-1 relative flex flex-col justify-end">
+      {/* Overflow visible here ensures cards can pop up and shadows can drop down */}
+      <div className="flex-1 relative flex flex-col justify-end overflow-visible">
+        
         {/* The horizontal scroll area */}
-        <div className="relative z-10 w-full overflow-hidden flex flex-col justify-end pb-0.5 translate-y-1">
-          <div className="flex items-end overflow-x-auto shelf-scroll px-8 space-x-2 min-h-0 overflow-y-hidden">
+        <div className="relative z-10 w-full flex flex-col justify-end pb-1">
+          {/* min-h-[110px] gives cards room to animate without clipping their tops */}
+          <div className="flex items-end overflow-x-auto shelf-scroll px-8 space-x-3 min-h-[110px]">
              <AnimatePresence mode="popLayout">
               {ingredients.map((item) => (
                 <IngredientCard 
@@ -36,39 +38,36 @@ export default function PantryShelf({ shelfNumber, label, ingredients, onRemove 
               ))}
             </AnimatePresence>
             {ingredients.length === 0 && (
-              <div className="h-14 flex items-center px-4 opacity-10 italic text-[10px] text-[#5d4037] uppercase tracking-widest">
+              <div className="h-14 flex items-center px-4 opacity-40 italic text-[10px] text-[#8c7a6b] uppercase tracking-widest">
                 — waiting for ingredients —
               </div>
             )}
           </div>
         </div>
         
-        {/* The Wooden Board Floor (Improved Depth & Smoothness) */}
+        {/* The Bright Beige Wooden Board Floor */}
         <div 
-          className="h-5 w-full relative z-0" 
+          className="h-5 w-full relative z-[5] bg-[#fdf6e3] border-t border-[#e5dcc5]" 
           style={{ 
-            backgroundColor: "#b58b5e",
-            // Use a radial mask to dissolve the shelf edges into the cabinet frame
+            // Use a linear mask to dissolve the shelf edges smoothly into the bright cabinet frame
             maskImage: "linear-gradient(to right, transparent, black 5%, black 95%, transparent)",
             WebkitMaskImage: "linear-gradient(to right, transparent, black 5%, black 95%, transparent)"
           }}
         >
-          {/* Subtle wood grain overlay with lower opacity to prevent repetition fatigue */}
+          {/* Extremely subtle wood grain overlay to prevent repetition fatigue (opacity 0.03) */}
           <div 
-            className="absolute inset-0 opacity-[0.07]"
+            className="absolute inset-0 opacity-[0.03]"
             style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" }} 
           />
           
-          {/* Top highlight for sunlight hitting the edge */}
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/20" />
+          {/* Top highlight for soft sunlight hitting the edge */}
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/60" />
           
-          {/* Front Edge of the Board */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-2 bg-[#8b5a2b]"
-          />
+          {/* Front Edge of the Board - Soft, darker beige */}
+          <div className="absolute bottom-0 left-0 right-0 h-2 bg-[#f0e6d2]" />
           
-          {/* Heavy Cast Shadow Under the Shelf */}
-          <div className="absolute -bottom-6 left-0 right-0 h-6 bg-gradient-to-b from-[rgba(62,39,35,0.4)] to-transparent pointer-events-none z-[-1]" />
+          {/* Heavy Cast Shadow Under the Shelf - Z-index -1 pushes it behind the shelf */}
+          <div className="absolute -bottom-8 left-0 right-0 h-8 bg-gradient-to-b from-[rgba(93,64,55,0.12)] to-transparent pointer-events-none z-[-1]" />
         </div>
       </div>
     </div>

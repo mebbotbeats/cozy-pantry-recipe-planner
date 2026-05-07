@@ -20,14 +20,14 @@ const SHELF_LABELS: Record<number, string> = {
 export default function App() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const[isInputOpen, setIsInputOpen] = useState(false);
-  const [isPlanOpen, setIsPlanOpen] = useState(false);
+  const[isPlanOpen, setIsPlanOpen] = useState(false);
   const [isOrganizing, setIsOrganizing] = useState(false);
   const[mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
 
   // --- MONETIZATION & AUTH STATE ---
   const [user, setUser] = useState<User | null>(null);
   const [credits, setCredits] = useState<number>(0);
-  const [particles] = useState(() => 
+  const[particles] = useState(() => 
     [...Array(15)].map(() => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
@@ -195,9 +195,10 @@ export default function App() {
     <div id="app-root" className="h-screen w-screen overflow-hidden bg-[var(--pantry-bg)] relative">
       
       {/* CAPTURE ZONE: Holds the background, shelves, and buttons. Modals sit outside! */}
-      <div id="pantry-capture-zone" className="h-full w-full flex flex-col relative bg-[#d4b38e]/20">
+      {/* FIXED: Removed the dark bg overlay and added bokeh-glow for the bright effect */}
+      <div id="pantry-capture-zone" className="h-full w-full flex flex-col relative bokeh-glow">
         
-        {/* The deep dark cabinet vignette */}
+        {/* The bright cabinet vignette (carved-wall from index.css) */}
         <div className="absolute inset-0 pointer-events-none z-40 carved-wall" />
         
         {/* The Alpine Sunbeam */}
@@ -266,7 +267,8 @@ export default function App() {
         </header>
 
         {/* Shelves Container */}
-        <main id="pantry-canvas" className="flex-1 flex flex-col overflow-hidden px-10 z-[45]">
+        {/* FIXED: Removed overflow-hidden so the shelf shadows can cast onto the wall below them */}
+        <main id="pantry-canvas" className="flex-1 flex flex-col px-10 z-[45] py-2">
           {[1, 2, 3, 4, 5].map((shelfNum) => (
             <PantryShelf
               key={shelfNum}

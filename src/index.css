@@ -54,13 +54,18 @@ body {
 }
 
 /* Update your carved-wall and add the cabinet frame */
+/* The bright, cozy cabinet frame */
 .carved-wall {
-  /* Deep, dark wood-toned vignette to create an enclosed cabinet feel */
   box-shadow: 
-    inset 0px 0px 150px 20px rgba(62, 39, 35, 0.6),
-    inset 0px 0px 40px 10px rgba(40, 20, 10, 0.8);
+    inset 40px 0 80px 0px rgba(253, 246, 227, 0.5), /* Bright inner glow */
+    inset -40px 0 80px 0px rgba(253, 246, 227, 0.5);
+  pointer-events: none;
 }
 
+/* Brighter, softer bokeh-like ambient glow */
+.bokeh-glow {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, rgba(253, 246, 227, 0.1) 70%);
+}
 /* The God-Ray Sunbeam */
 .sunbeam {
   background: linear-gradient(
