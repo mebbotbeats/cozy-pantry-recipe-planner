@@ -7,7 +7,6 @@ interface PantryShelfProps {
   label: string;
   ingredients: Ingredient[];
   onRemove: (id: string) => void;
-  key?: string | number;
 }
 
 export default function PantryShelf({ shelfNumber, label, ingredients, onRemove }: PantryShelfProps) {
@@ -24,7 +23,7 @@ export default function PantryShelf({ shelfNumber, label, ingredients, onRemove 
       </div>
 
       <div className="flex-1 relative flex flex-col justify-end">
-        {/* The horizontal scroll area - The "Floor" area where items sit */}
+        {/* The horizontal scroll area */}
         <div className="relative z-10 w-full overflow-hidden flex flex-col justify-end pb-0.5 translate-y-1">
           <div className="flex items-end overflow-x-auto shelf-scroll px-8 space-x-2 min-h-0 overflow-y-hidden">
              <AnimatePresence mode="popLayout">
@@ -44,24 +43,31 @@ export default function PantryShelf({ shelfNumber, label, ingredients, onRemove 
           </div>
         </div>
         
-        {/* The Wooden Board Floor (Rustic Alpine Cottage Style) */}
+        {/* The Wooden Board Floor (Improved Depth & Smoothness) */}
         <div 
-          className="h-5 w-full relative z-0 border-t border-[#8b5a2b]/30 shadow-inner" 
+          className="h-5 w-full relative z-0" 
           style={{ 
-            backgroundColor: "#b58b5e", 
-            backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" 
+            backgroundColor: "#b58b5e",
+            // Use a radial mask to dissolve the shelf edges into the cabinet frame
+            maskImage: "linear-gradient(to right, transparent, black 5%, black 95%, transparent)",
+            WebkitMaskImage: "linear-gradient(to right, transparent, black 5%, black 95%, transparent)"
           }}
         >
-          {/* Top highlight for sunlight hitting the edge */}
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/20" />
-          
-          {/* Front Edge of the Board - Darker thickness for depth */}
+          {/* Subtle wood grain overlay with lower opacity to prevent repetition fatigue */}
           <div 
-            className="absolute bottom-0 left-0 right-0 h-2 bg-[#8b5a2b] border-t border-[#5c3a21]/40" 
+            className="absolute inset-0 opacity-[0.07]"
             style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" }} 
           />
           
-          {/* Heavy Cast Shadow Under the Shelf to make it pop off the background */}
+          {/* Top highlight for sunlight hitting the edge */}
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/20" />
+          
+          {/* Front Edge of the Board */}
+          <div 
+            className="absolute bottom-0 left-0 right-0 h-2 bg-[#8b5a2b]"
+          />
+          
+          {/* Heavy Cast Shadow Under the Shelf */}
           <div className="absolute -bottom-6 left-0 right-0 h-6 bg-gradient-to-b from-[rgba(62,39,35,0.4)] to-transparent pointer-events-none z-[-1]" />
         </div>
       </div>
