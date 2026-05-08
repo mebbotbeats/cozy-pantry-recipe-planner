@@ -1,4 +1,3 @@
-=== File: PantryShelf.tsx ===
 import { AnimatePresence } from "motion/react";
 import { Ingredient } from "../types";
 import IngredientCard from "./IngredientCard";
@@ -37,14 +36,14 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
               Object.entries(groupedIngredients).map(([groupName, items]) => (
                 
                 /* =========================================================
-                 * THE BULLETPROOF GRID WRAPPER
-                 * Using CSS Grid to overlap items in the exact same cell.
+                 * FOOLPROOF WRAPPER: relative + inline-block
+                 * Shrink-wraps the cards and anchors the absolute label.
                  * ========================================================= */
-                <div key={groupName} className="grid items-end justify-items-center relative">
+                <div key={groupName} className="relative inline-block pt-6 shrink-0">
                   
-                  {/* 1. THE CARDS (Z-Index 10) */}
-                  {/* Assigned to Grid Cell 1x1. pb-4 lifts them up off the floor! */}
-                  <div className="col-start-1 row-start-1 flex items-end space-x-2 px-3 pb-4 z-10">
+                  {/* 1. THE CARDS (Normal Flow) */}
+                  {/* pb-4 creates a physical empty gap at the bottom for the label to sit over */}
+                  <div className="flex items-end space-x-2 px-3 pb-4 relative z-10">
                     <AnimatePresence mode="popLayout">
                       {items.map((item) => (
                         <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
@@ -52,9 +51,9 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </AnimatePresence>
                   </div>
 
-                  {/* 2. THE TRAY LIP (Z-Index 20) */}
-                  {/* Also assigned to Grid Cell 1x1. self-end forces it to the bottom. w-full spans the cards. */}
-                  <div className="col-start-1 row-start-1 self-end w-full z-20 h-7 bg-[#e8dbce] rounded-[4px_4px_2px_2px] border-t-2 border-b border-x border-[#c4b2a3] shadow-[0_-2px_4px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.8)] flex items-center justify-between px-2">
+                  {/* 2. THE TRAY LIP (Absolute Position) */}
+                  {/* absolute bottom-0 perfectly anchors it to the bottom edge, regardless of flex/grid rules */}
+                  <div className="absolute bottom-[2px] left-0 right-0 z-20 h-6 bg-[#e8dbce] rounded-[4px_4px_2px_2px] border-t-2 border-b border-x border-[#c4b2a3] shadow-[0_-2px_4px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-between px-2 pointer-events-none">
                     
                     {/* Left Screw */}
                     <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
@@ -62,7 +61,7 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </div>
                     
                     {/* Category Label */}
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate text-center w-full select-none drop-shadow-sm">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate text-center w-full drop-shadow-sm select-none">
                       {groupName}
                     </span>
 
