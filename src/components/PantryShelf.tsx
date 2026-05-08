@@ -1,3 +1,4 @@
+=== File: PantryShelf.tsx ===
 import { AnimatePresence } from "motion/react";
 import { Ingredient } from "../types";
 import IngredientCard from "./IngredientCard";
@@ -13,7 +14,7 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
   // Group ingredients by their AI-assigned group name
   const groupedIngredients = ingredients.reduce((acc, item) => {
     const g = item.group || "Miscellaneous";
-    if (!acc[g]) acc[g] =[];
+    if (!acc[g]) acc[g] = [];
     acc[g].push(item);
     return acc;
   }, {} as Record<string, Ingredient[]>);
@@ -36,14 +37,23 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
               // Map through each group to create clusters!
               Object.entries(groupedIngredients).map(([groupName, items]) => (
                 <div key={groupName} className="relative flex flex-col items-center">
-                  
-                  {/* Dynamic Stretched Brass Nameplate Above the Cluster */}
-                  <div className="absolute -top-7 left-0 right-0 z-0 flex justify-center min-w-[80px]">
+
+                  {/* The actual food items in this cluster */}
+                  <div className="flex items-end space-x-2 relative z-10 w-full justify-center pb-2">
+                    <AnimatePresence mode="popLayout">
+                      {items.map((item) => (
+                        <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
+                      ))}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Dynamic Stretched Brass Nameplate (Now acts as a shallow basket front) */}
+                  <div className="absolute bottom-0 -left-3 -right-3 z-20 flex justify-center min-w-[80px]">
                     <div className="relative w-full">
                       {/* Drop shadow */}
-                      <div className="absolute inset-0 bg-black/15 translate-y-1 blur-[2px] rounded-sm" />
+                      <div className="absolute inset-0 bg-black/15 translate-y-1.5 blur-[2px] rounded-md" />
                       
-                      <div className="relative flex items-center justify-between w-full bg-[#e8dbce] px-2 py-1 rounded-sm border border-[#c4b2a3]">
+                      <div className="relative flex items-center justify-between w-full bg-[#e8dbce] px-2 py-1.5 rounded-[4px_4px_6px_6px] border-b-[3px] border-r border-l border-[#c4b2a3]">
                         {/* Left Screw */}
                         <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
                           <div className="w-[1px] h-1 bg-black/30 rotate-45" />
@@ -62,14 +72,6 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </div>
                   </div>
 
-                  {/* The actual food items in this cluster */}
-                  <div className="flex items-end space-x-2 relative z-10 w-full justify-center">
-                    <AnimatePresence mode="popLayout">
-                      {items.map((item) => (
-                        <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
-                      ))}
-                    </AnimatePresence>
-                  </div>
                 </div>
               ))
             )}
