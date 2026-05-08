@@ -37,9 +37,10 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
               // Map through each group to create clusters!
               Object.entries(groupedIngredients).map(([groupName, items]) => (
                 <div key={groupName} className="relative flex flex-col items-center">
-
+                  
                   {/* The actual food items in this cluster */}
-                  <div className="flex items-end space-x-2 relative z-10 w-full justify-center pb-2">
+                  {/* Added pb-4 so the cards have space to sit behind the basket lip */}
+                  <div className="flex items-end space-x-2 relative z-10 w-full justify-center pb-4">
                     <AnimatePresence mode="popLayout">
                       {items.map((item) => (
                         <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
@@ -47,20 +48,21 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </AnimatePresence>
                   </div>
 
-                  {/* Dynamic Stretched Brass Nameplate (Now acts as a shallow basket front) */}
-                  <div className="absolute bottom-0 -left-3 -right-3 z-20 flex justify-center min-w-[80px]">
+                  {/* Dynamic Stretched Brass Nameplate - NOW AT THE BOTTOM */}
+                  {/* Moved to bottom-0 and z-20 to ensure it's in front */}
+                  <div className="absolute bottom-0 left-[-8px] right-[-8px] z-20 flex justify-center min-w-[80px]">
                     <div className="relative w-full">
-                      {/* Drop shadow */}
-                      <div className="absolute inset-0 bg-black/15 translate-y-1.5 blur-[2px] rounded-md" />
+                      {/* Deep shadow for the tray front */}
+                      <div className="absolute inset-0 bg-black/25 translate-y-1 blur-[3px] rounded-sm" />
                       
-                      <div className="relative flex items-center justify-between w-full bg-[#e8dbce] px-2 py-1.5 rounded-[4px_4px_6px_6px] border-b-[3px] border-r border-l border-[#c4b2a3]">
+                      <div className="relative flex items-center justify-between w-full bg-[#e8dbce] px-2 py-1.5 rounded-sm border-t border-b-2 border-x border-[#c4b2a3] shadow-[inset_0_1px_2px_rgba(255,255,255,0.5)]">
                         {/* Left Screw */}
                         <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
                           <div className="w-[1px] h-1 bg-black/30 rotate-45" />
                         </div>
                         
                         {/* Group Text */}
-                        <span className="text-[9px] uppercase tracking-[0.25em] text-[#4a3b32] font-bold px-2 truncate text-center w-full">
+                        <span className="text-[9px] uppercase tracking-[0.25em] text-[#4a3b32] font-bold px-2 truncate text-center w-full drop-shadow-sm">
                           {groupName}
                         </span>
                         
