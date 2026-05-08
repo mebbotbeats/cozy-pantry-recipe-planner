@@ -40,10 +40,11 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
         
         <div className="relative z-10 w-full flex flex-col justify-end min-h-0 min-w-0 max-w-full">
           
-          <div className="flex items-end justify-start overflow-x-auto shelf-scroll px-6 sm:px-10 space-x-4 sm:space-x-8 min-h-[120px] pb-[1px] relative z-10 w-full">
+          {/* justify-start aligns everything to the left. */}
+          <div className="flex items-end justify-start overflow-x-auto shelf-scroll px-6 sm:px-10 space-x-4 sm:space-x-8 min-h-[120px] pb-0 relative z-10 w-full">
             
             {ingredients.length === 0 ? (
-              <div className="h-10 sm:h-14 flex items-center px-4 opacity-40 text-[11px] text-[#5c4a3d] font-medium tracking-wide pb-2 w-full">
+              <div className="h-10 sm:h-14 flex items-center px-4 opacity-40 text-[11px] text-[#5c4a3d] font-medium tracking-wide pb-4 w-full">
                 <span className="italic">Dust motes dance on an empty shelf...</span>
               </div>
             ) : (
@@ -54,7 +55,7 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                   <div key={groupName} className="relative inline-flex flex-col items-start pt-6 shrink-0">
                     
                     {/* 1. THE CARDS */}
-                    {/* pb-5 ensures the cards tuck exactly 8px behind the h-7 crate front */}
+                    {/* pb-5 matches the tuck depth */}
                     <div className="flex items-end justify-start space-x-2 px-4 pb-5 relative z-10">
                       <AnimatePresence mode="popLayout">
                         {items.map((item) => (
@@ -63,13 +64,16 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                       </AnimatePresence>
                     </div>
 
-                    {/* 2. THE SLIM VINTAGE CRATE FRONT */}
-                    {/* Height reduced to h-7 (28px) to match the pro label size */}
-                    <div className={`absolute bottom-[2px] left-0 right-0 z-20 h-7 ${crate.bg} rounded-[1px] border-t-2 border-b border-x ${crate.border} shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.3)] flex items-center justify-center overflow-hidden pointer-events-none`}>
+                    {/* 2. THE VINTAGE CRATE FRONT */}
+                    {/* bottom-[-1px] grounds it perfectly on the shelf highlight */}
+                    <div className={`absolute -bottom-[1px] left-0 right-0 z-20 h-7 ${crate.bg} rounded-[1px] border-t-2 border-b border-x ${crate.border} shadow-[0_1px_3px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden pointer-events-none`}>
                       
                       {/* Wood Texture */}
                       <div className="absolute inset-0 opacity-[0.3] mix-blend-multiply" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" }} />
                       
+                      {/* NEW: Soft Dark Gradient (Ambient Occlusion) */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-80" />
+
                       {/* Slat lines */}
                       <div className="absolute inset-0 flex justify-evenly opacity-15">
                         <div className="w-[1px] h-full bg-black" />
@@ -77,8 +81,8 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                       </div>
 
                       {/* Painted Straps */}
-                      <div className={`absolute left-[12%] top-0 bottom-0 w-1.5 ${crate.strap} opacity-50 mix-blend-multiply`} />
-                      <div className={`absolute right-[12%] top-0 bottom-0 w-1.5 ${crate.strap} opacity-50 mix-blend-multiply`} />
+                      <div className={`absolute left-[12%] top-0 bottom-0 w-1.5 ${crate.strap} opacity-40 mix-blend-multiply`} />
+                      <div className={`absolute right-[12%] top-0 bottom-0 w-1.5 ${crate.strap} opacity-40 mix-blend-multiply`} />
 
                       {/* Tiny Iron Nails */}
                       <div className="absolute left-0.5 top-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
