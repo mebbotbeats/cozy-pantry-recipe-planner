@@ -65,7 +65,7 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </div>
 
                     {/* 2. THE VINTAGE CRATE FRONT */}
-                    {/* bottom-[-1px] grounds it perfectly on the shelf highlight */}
+                    {/* bottom-[-2px] grounds it perfectly on the shelf highlight */}
                     <div className={`absolute -bottom-[1px] left-0 right-0 z-20 h-7 ${crate.bg} rounded-[1px] border-t-2 border-b border-x ${crate.border} shadow-[0_1px_3px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden pointer-events-none`}>
                       
                       {/* Wood Texture */}
