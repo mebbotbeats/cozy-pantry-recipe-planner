@@ -10,6 +10,7 @@ interface PantryShelfProps {
 
 export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps) {
   
+  // Group ingredients by their AI-assigned group name
   const groupedIngredients = ingredients.reduce((acc, item) => {
     const g = item.group || "Miscellaneous";
     if (!acc[g]) acc[g] = [];
@@ -18,26 +19,30 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
   }, {} as Record<string, Ingredient[]>);
 
   return (
-    <div className="flex-1 flex flex-col relative overflow-visible z-[1] group min-h-0 mt-4">
+    /* min-w-0 and max-w-full are CRITICAL to stop flexbox from expanding off-screen, enabling the scrollbar! */
+    <div className="flex-1 flex flex-col relative overflow-visible z-[1] group min-h-0 mt-4 min-w-0 max-w-full">
       
-      <div className="flex-1 relative flex flex-col justify-end overflow-visible min-h-0">
+      <div className="flex-1 relative flex flex-col justify-end overflow-visible min-h-0 min-w-0 max-w-full">
         
         {/* Horizontal Scroll Area */}
-        <div className="relative z-10 w-full flex flex-col justify-end min-h-0">
+        <div className="relative z-10 w-full flex flex-col justify-end min-h-0 min-w-0 max-w-full">
           
-          <div className="flex items-end overflow-x-auto shelf-scroll px-8 space-x-6 sm:space-x-8 min-h-[120px] pb-1 relative z-10">
+          {/* justify-start aligns everything to the left. overflow-x-auto enables horizontal scroll. */}
+          <div className="flex items-end justify-start overflow-x-auto shelf-scroll px-6 sm:px-10 space-x-4 sm:space-x-8 min-h-[120px] pb-[1px] relative z-10 w-full">
             
             {ingredients.length === 0 ? (
-              <div className="h-10 sm:h-14 flex items-center px-4 opacity-40 text-[11px] text-[#5c4a3d] font-medium tracking-wide pb-2">
+              <div className="h-10 sm:h-14 flex items-center px-4 opacity-40 text-[11px] text-[#5c4a3d] font-medium tracking-wide pb-2 w-full">
                 <span className="italic">Dust motes dance on an empty shelf...</span>
               </div>
             ) : (
               Object.entries(groupedIngredients).map(([groupName, items]) => (
-                <div key={groupName} className="flex flex-col items-center justify-end shrink-0 pt-4">
+                
+                /* inline-flex and items-start ensures the group builds left-to-right */
+                <div key={groupName} className="relative inline-flex flex-col items-start pt-6 shrink-0">
                   
-                  {/* 1. THE CARDS (Z-Index 10) */}
-                  {/* pb-4 adds 16px of invisible padding below the cards. */}
-                  <div className="flex items-end space-x-2 px-3 pb-4 relative z-10">
+                  {/* 1. THE CARDS (Normal Flow) */}
+                  {/* pb-4 creates the physical gap at the bottom for the label to sit over */}
+                  <div className="flex items-end justify-start space-x-2 px-3 pb-4 relative z-10">
                     <AnimatePresence mode="popLayout">
                       {items.map((item) => (
                         <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
@@ -45,22 +50,22 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </AnimatePresence>
                   </div>
 
-                  {/* 2. THE TRAY LIP (Z-Index 20) */}
-                  {/* -mt-7 pulls this UP by 28px. It easily covers the 16px padding + tucks the cards 12px deep! */}
-                  <div className="relative z-20 w-[calc(100%+12px)] h-[24px] -mt-7 bg-[#e8dbce] rounded-t-sm border border-[#c4b2a3] flex items-center justify-between px-2 shadow-[0_-2px_4px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.7)] pointer-events-none">
+                  {/* 2. THE TRAY LIP (Absolute Position) */}
+                  {/* absolute bottom-[2px] locks it to the bottom, completely unaffected by the cards */}
+                  <div className="absolute bottom-[2px] left-0 right-0 z-20 h-6 bg-[#e8dbce] rounded-[4px_4px_2px_2px] border-t-2 border-b border-x border-[#c4b2a3] shadow-[0_-2px_4px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-between px-2 pointer-events-none">
                     
                     {/* Left Screw */}
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner shrink-0 flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
                       <div className="w-[1px] h-0.5 bg-black/40 rotate-45" />
                     </div>
                     
                     {/* Category Label */}
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate w-full text-center select-none drop-shadow-sm">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate text-center w-full drop-shadow-sm select-none">
                       {groupName}
                     </span>
 
                     {/* Right Screw */}
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner shrink-0 flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
                       <div className="w-[1px] h-0.5 bg-black/40 -rotate-45" />
                     </div>
 
@@ -68,6 +73,9 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                 </div>
               ))
             )}
+            
+            {/* Invisible spacer to maintain the right-side padding when fully scrolled to the edge */}
+            {ingredients.length > 0 && <div className="shrink-0 w-4 sm:w-8 h-1" />}
           </div>
         </div>
         

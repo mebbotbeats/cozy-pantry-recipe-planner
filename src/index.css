@@ -86,3 +86,29 @@ body {
   animation: floatUp 8s infinite linear;
   pointer-events: none;
 }
+
+/* Organic horizontal scroll bar for shelves */
+.shelf-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #a39182 transparent;
+}
+
+.shelf-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.shelf-scroll::-webkit-scrollbar-track {
+  background: rgba(94, 67, 42, 0.05);
+  border-radius: 10px;
+  margin: 0 20px; /* Keeps scrollbar from hitting the exact edge */
+}
+
+.shelf-scroll::-webkit-scrollbar-thumb {
+  background: #c4b2a3; /* Matches the tray color */
+  border-radius: 10px;
+  border: 2px solid var(--pantry-bg); /* Creates a floating organic pill effect */
+}
+
+.shelf-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a39182;
+}
