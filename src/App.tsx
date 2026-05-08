@@ -9,16 +9,26 @@ import { captureElement, shareImages } from "./lib/share";
 import { supabase } from "./lib/supabase";
 import { User } from "@supabase/supabase-js";
 
+// Helper function: Forces all ingredients in the same group to share the same shelf
+const normalizeShelves = (items: Ingredient[]) => {
+  const groupShelves: Record<string, number> = {};
+  return items.map(item => {
+    const g = item.group || "Miscellaneous";
+    if (!groupShelves[g]) groupShelves[g] = item.shelf;
+    return { ...item, shelf: groupShelves[g] };
+  });
+};
+
 export default function App() {
   const[ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [isPlanOpen, setIsPlanOpen] = useState(false);
   const[isOrganizing, setIsOrganizing] = useState(false);
-  const[mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
+  const [mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
 
   const [user, setUser] = useState<User | null>(null);
   const [credits, setCredits] = useState<number>(0);
-  const[particles] = useState(() => 
+  const [particles] = useState(() => 
     [...Array(15)].map(() => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
@@ -71,7 +81,10 @@ export default function App() {
   useEffect(() => {
     const saved = localStorage.getItem("cozy-pantry-storage");
     if (saved) {
-      try { setIngredients(JSON.parse(saved)); } catch (e) { }
+      try { 
+        // Load and fix any broken groups from cache!
+        setIngredients(normalizeShelves(JSON.parse(saved))); 
+      } catch (e) { }
     }
   },[]);
 
@@ -85,7 +98,10 @@ export default function App() {
     try {
       const newItems = await organizePantry(input);
       if (newItems.length > 0) {
-        setIngredients((prev) => [...prev, ...newItems]);
+        setIngredients((prev) => {
+          // Combine old and new, then normalize so the AI doesn't fragment groups
+          return normalizeShelves([...prev, ...newItems]);
+        });
         setIsInputOpen(false);
       }
     } catch (error) {
@@ -116,7 +132,7 @@ export default function App() {
     setIsExporting(true);
     try {
       const pantryImg = await captureElement("pantry-capture-zone", "my-cozy-pantry");
-      const images =[pantryImg].filter(Boolean) as string[];
+      const images = [pantryImg].filter(Boolean) as string[];
       const menuImg = await captureElement("meal-plan-canvas", "my-chef-menu");
       if (menuImg) images.push(menuImg);
       const shared = await shareImages(images, "Check out my pantry setup and chef-curated menu!");
@@ -175,7 +191,6 @@ export default function App() {
         </header>
 
         <main id="pantry-canvas" className="flex-1 flex flex-col px-4 sm:px-10 z-[45] pb-2 min-h-0">
-          {/* We now just map blank shelves and pass the filtered ingredients to them! */}
           {[1, 2, 3, 4, 5].map((shelfNum) => (
             <PantryShelf
               key={shelfNum}
