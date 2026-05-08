@@ -8,9 +8,24 @@ interface PantryShelfProps {
   onRemove: (id: string) => void;
 }
 
+const getCrateStyle = (groupName: string) => {
+  const styles = [
+    { bg: "bg-[#d2b48c]", border: "border-[#a68a61]", text: "text-[#3e2723]", strap: "bg-[#8b0000]" }, 
+    { bg: "bg-[#cd853f]", border: "border-[#8a5a2b]", text: "text-[#1a0f05]", strap: "bg-[#2f4f4f]" }, 
+    { bg: "bg-[#deb887]", border: "border-[#b8860b]", text: "text-[#2c1e0f]", strap: "bg-[#3e2723]" }, 
+    { bg: "bg-[#c17a47]", border: "border-[#8a4a25]", text: "text-[#1a0f05]", strap: "bg-[#8b0000]" }, 
+    { bg: "bg-[#e6c280]", border: "border-[#c19a6b]", text: "text-[#3e2723]", strap: "bg-[#556b2f]" }, 
+  ];
+  
+  let hash = 0;
+  for (let i = 0; i < groupName.length; i++) {
+    hash = groupName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return styles[Math.abs(hash) % styles.length];
+};
+
 export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps) {
   
-  // Group ingredients by their AI-assigned group name
   const groupedIngredients = ingredients.reduce((acc, item) => {
     const g = item.group || "Miscellaneous";
     if (!acc[g]) acc[g] = [];
@@ -19,15 +34,12 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
   }, {} as Record<string, Ingredient[]>);
 
   return (
-    /* min-w-0 and max-w-full are CRITICAL to stop flexbox from expanding off-screen, enabling the scrollbar! */
     <div className="flex-1 flex flex-col relative overflow-visible z-[1] group min-h-0 mt-4 min-w-0 max-w-full">
       
       <div className="flex-1 relative flex flex-col justify-end overflow-visible min-h-0 min-w-0 max-w-full">
         
-        {/* Horizontal Scroll Area */}
         <div className="relative z-10 w-full flex flex-col justify-end min-h-0 min-w-0 max-w-full">
           
-          {/* justify-start aligns everything to the left. overflow-x-auto enables horizontal scroll. */}
           <div className="flex items-end justify-start overflow-x-auto shelf-scroll px-6 sm:px-10 space-x-4 sm:space-x-8 min-h-[120px] pb-[1px] relative z-10 w-full">
             
             {ingredients.length === 0 ? (
@@ -35,46 +47,56 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                 <span className="italic">Dust motes dance on an empty shelf...</span>
               </div>
             ) : (
-              Object.entries(groupedIngredients).map(([groupName, items]) => (
-                
-                /* inline-flex and items-start ensures the group builds left-to-right */
-                <div key={groupName} className="relative inline-flex flex-col items-start pt-6 shrink-0">
-                  
-                  {/* 1. THE CARDS (Normal Flow) */}
-                  {/* pb-4 creates the physical gap at the bottom for the label to sit over */}
-                  <div className="flex items-end justify-start space-x-2 px-3 pb-4 relative z-10">
-                    <AnimatePresence mode="popLayout">
-                      {items.map((item) => (
-                        <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
-                      ))}
-                    </AnimatePresence>
-                  </div>
+              Object.entries(groupedIngredients).map(([groupName, items]) => {
+                const crate = getCrateStyle(groupName);
 
-                  {/* 2. THE TRAY LIP (Absolute Position) */}
-                  {/* absolute bottom-[2px] locks it to the bottom, completely unaffected by the cards */}
-                  <div className="absolute bottom-[2px] left-0 right-0 z-20 h-6 bg-[#e8dbce] rounded-[4px_4px_2px_2px] border-t-2 border-b border-x border-[#c4b2a3] shadow-[0_-2px_4px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-between px-2 pointer-events-none">
+                return (
+                  <div key={groupName} className="relative inline-flex flex-col items-start pt-6 shrink-0">
                     
-                    {/* Left Screw */}
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
-                      <div className="w-[1px] h-0.5 bg-black/40 rotate-45" />
-                    </div>
-                    
-                    {/* Category Label */}
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate text-center w-full drop-shadow-sm select-none">
-                      {groupName}
-                    </span>
-
-                    {/* Right Screw */}
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
-                      <div className="w-[1px] h-0.5 bg-black/40 -rotate-45" />
+                    {/* 1. THE CARDS */}
+                    {/* pb-5 ensures the cards tuck exactly 8px behind the h-7 crate front */}
+                    <div className="flex items-end justify-start space-x-2 px-4 pb-5 relative z-10">
+                      <AnimatePresence mode="popLayout">
+                        {items.map((item) => (
+                          <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
+                        ))}
+                      </AnimatePresence>
                     </div>
 
+                    {/* 2. THE SLIM VINTAGE CRATE FRONT */}
+                    {/* Height reduced to h-7 (28px) to match the pro label size */}
+                    <div className={`absolute bottom-[2px] left-0 right-0 z-20 h-7 ${crate.bg} rounded-[1px] border-t-2 border-b border-x ${crate.border} shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.3)] flex items-center justify-center overflow-hidden pointer-events-none`}>
+                      
+                      {/* Wood Texture */}
+                      <div className="absolute inset-0 opacity-[0.3] mix-blend-multiply" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" }} />
+                      
+                      {/* Slat lines */}
+                      <div className="absolute inset-0 flex justify-evenly opacity-15">
+                        <div className="w-[1px] h-full bg-black" />
+                        <div className="w-[1px] h-full bg-black" />
+                      </div>
+
+                      {/* Painted Straps */}
+                      <div className={`absolute left-[12%] top-0 bottom-0 w-1.5 ${crate.strap} opacity-50 mix-blend-multiply`} />
+                      <div className={`absolute right-[12%] top-0 bottom-0 w-1.5 ${crate.strap} opacity-50 mix-blend-multiply`} />
+
+                      {/* Tiny Iron Nails */}
+                      <div className="absolute left-0.5 top-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
+                      <div className="absolute right-0.5 top-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
+                      <div className="absolute left-0.5 bottom-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
+                      <div className="absolute right-0.5 bottom-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
+                      
+                      {/* Stamped Category Name */}
+                      <span className={`relative z-10 text-[10px] font-serif uppercase tracking-[0.2em] ${crate.text} font-black px-4 truncate text-center w-full opacity-75 mix-blend-multiply`}>
+                        {groupName}
+                      </span>
+
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
             
-            {/* Invisible spacer to maintain the right-side padding when fully scrolled to the edge */}
             {ingredients.length > 0 && <div className="shrink-0 w-4 sm:w-8 h-1" />}
           </div>
         </div>
