@@ -40,11 +40,11 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
         
         <div className="relative z-10 w-full flex flex-col justify-end min-h-0 min-w-0 max-w-full">
           
-          {/* justify-start aligns everything to the left. pb-0 is critical to avoid the gap. */}
+          {/* justify-start aligns everything to the left. */}
           <div className="flex items-end justify-start overflow-x-auto shelf-scroll px-6 sm:px-10 space-x-4 sm:space-x-8 min-h-[120px] pb-0 relative z-10 w-full">
             
             {ingredients.length === 0 ? (
-              <div className="h-10 sm:h-14 flex items-center px-4 opacity-40 text-[11px] text-[#5c4a3d] font-medium tracking-wide pb-6 w-full">
+              <div className="h-10 sm:h-14 flex items-center px-4 opacity-40 text-[11px] text-[#5c4a3d] font-medium tracking-wide pb-4 w-full">
                 <span className="italic">Dust motes dance on an empty shelf...</span>
               </div>
             ) : (
@@ -55,7 +55,8 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                   <div key={groupName} className="relative inline-flex flex-col items-start pt-6 shrink-0">
                     
                     {/* 1. THE CARDS */}
-                    <div className="flex items-end justify-start space-x-2 px-4 pb-6 relative z-10">
+                    {/* pb-5 matches the tuck depth */}
+                    <div className="flex items-end justify-start space-x-3 px-4 pb-5 relative z-10">
                       <AnimatePresence mode="popLayout">
                         {items.map((item) => (
                           <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
@@ -64,17 +65,17 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </div>
 
                     {/* 2. THE VINTAGE CRATE FRONT */}
-                    {/* -bottom-[4px] ensures it overlaps the shelf highlight line completely */}
-                    <div className={`absolute -bottom-[4px] left-0 right-0 z-20 h-7 ${crate.bg} rounded-t-[1px] border-t-2 border-x ${crate.border} shadow-[0_2px_4px_rgba(0,0,0,0.3)] flex items-center justify-center overflow-hidden pointer-events-none`}>
+                    {/* bottom-[-2px] grounds it perfectly on the shelf highlight */}
+                    <div className={`absolute -bottom-[1px] left-0 right-0 z-20 h-7 ${crate.bg} rounded-[1px] border-t-2 border-b border-x ${crate.border} shadow-[0_1px_3px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden pointer-events-none`}>
                       
                       {/* Wood Texture */}
-                      <div className="absolute inset-0 opacity-[0.35] mix-blend-multiply" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" }} />
+                      <div className="absolute inset-0 opacity-[0.3] mix-blend-multiply" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" }} />
                       
-                      {/* Deep Bottom Shadow (Gradient) */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-90" />
+                      {/* NEW: Soft Dark Gradient (Ambient Occlusion) */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-80" />
 
                       {/* Slat lines */}
-                      <div className="absolute inset-0 flex justify-evenly opacity-20">
+                      <div className="absolute inset-0 flex justify-evenly opacity-15">
                         <div className="w-[1px] h-full bg-black" />
                         <div className="w-[1px] h-full bg-black" />
                       </div>
@@ -83,12 +84,14 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                       <div className={`absolute left-[12%] top-0 bottom-0 w-1.5 ${crate.strap} opacity-40 mix-blend-multiply`} />
                       <div className={`absolute right-[12%] top-0 bottom-0 w-1.5 ${crate.strap} opacity-40 mix-blend-multiply`} />
 
-                      {/* Iron Nails */}
+                      {/* Tiny Iron Nails */}
                       <div className="absolute left-0.5 top-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
                       <div className="absolute right-0.5 top-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
+                      <div className="absolute left-0.5 bottom-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
+                      <div className="absolute right-0.5 bottom-0.5 w-0.5 h-0.5 rounded-full bg-[#2a1a10] opacity-60" />
                       
-                      {/* Stamped Typography */}
-                      <span className={`relative z-10 text-[10px] font-serif uppercase tracking-[0.2em] ${crate.text} font-black px-4 truncate text-center w-full opacity-80 mix-blend-multiply`}>
+                      {/* Stamped Category Name */}
+                      <span className={`relative z-10 text-[10px] font-serif uppercase tracking-[0.2em] ${crate.text} font-black px-4 truncate text-center w-full opacity-75 mix-blend-multiply`}>
                         {groupName}
                       </span>
 
@@ -111,8 +114,8 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
               WebkitMaskImage: "linear-gradient(to right, transparent, black 4%, black 96%, transparent)"
             }}
           >
-            {/* The white highlight line - The crate now covers this! */}
-            <div className="h-[2px] w-full bg-white/60 relative z-10" />
+            {/* UPDATED: The Top edge line is now a dark wood color instead of white */}
+            <div className="h-[2px] w-full bg-[#5e432a]/80 relative z-10" />
             
             <div className="h-4 sm:h-5 w-full bg-[#b89570] relative overflow-hidden border-b border-[#5e432a]">
               <div className="absolute inset-0 opacity-[0.15] mix-blend-multiply" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/wood-pattern.png')" }} />
