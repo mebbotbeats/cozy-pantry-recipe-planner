@@ -10,7 +10,6 @@ interface PantryShelfProps {
 
 export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps) {
   
-  // Group ingredients by their AI-assigned group name
   const groupedIngredients = ingredients.reduce((acc, item) => {
     const g = item.group || "Miscellaneous";
     if (!acc[g]) acc[g] = [];
@@ -26,7 +25,7 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
         {/* Horizontal Scroll Area */}
         <div className="relative z-10 w-full flex flex-col justify-end min-h-0">
           
-          <div className="flex items-end overflow-x-auto shelf-scroll px-8 space-x-6 min-h-[120px] pb-[1px] relative z-10">
+          <div className="flex items-end overflow-x-auto shelf-scroll px-8 space-x-6 sm:space-x-8 min-h-[120px] pb-1 relative z-10">
             
             {ingredients.length === 0 ? (
               <div className="h-10 sm:h-14 flex items-center px-4 opacity-40 text-[11px] text-[#5c4a3d] font-medium tracking-wide pb-2">
@@ -34,15 +33,10 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
               </div>
             ) : (
               Object.entries(groupedIngredients).map(([groupName, items]) => (
-                
-                /* =========================================================
-                 * FOOLPROOF WRAPPER: relative + inline-block
-                 * Shrink-wraps the cards and anchors the absolute label.
-                 * ========================================================= */
-                <div key={groupName} className="relative inline-block pt-6 shrink-0">
+                <div key={groupName} className="flex flex-col items-center justify-end shrink-0 pt-4">
                   
-                  {/* 1. THE CARDS (Normal Flow) */}
-                  {/* pb-4 creates a physical empty gap at the bottom for the label to sit over */}
+                  {/* 1. THE CARDS (Z-Index 10) */}
+                  {/* pb-4 adds 16px of invisible padding below the cards. */}
                   <div className="flex items-end space-x-2 px-3 pb-4 relative z-10">
                     <AnimatePresence mode="popLayout">
                       {items.map((item) => (
@@ -51,22 +45,22 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </AnimatePresence>
                   </div>
 
-                  {/* 2. THE TRAY LIP (Absolute Position) */}
-                  {/* absolute bottom-0 perfectly anchors it to the bottom edge, regardless of flex/grid rules */}
-                  <div className="absolute bottom-[2px] left-0 right-0 z-20 h-6 bg-[#e8dbce] rounded-[4px_4px_2px_2px] border-t-2 border-b border-x border-[#c4b2a3] shadow-[0_-2px_4px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.7)] flex items-center justify-between px-2 pointer-events-none">
+                  {/* 2. THE TRAY LIP (Z-Index 20) */}
+                  {/* -mt-7 pulls this UP by 28px. It easily covers the 16px padding + tucks the cards 12px deep! */}
+                  <div className="relative z-20 w-[calc(100%+12px)] h-[24px] -mt-7 bg-[#e8dbce] rounded-t-sm border border-[#c4b2a3] flex items-center justify-between px-2 shadow-[0_-2px_4px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.7)] pointer-events-none">
                     
                     {/* Left Screw */}
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner shrink-0 flex items-center justify-center">
                       <div className="w-[1px] h-0.5 bg-black/40 rotate-45" />
                     </div>
                     
                     {/* Category Label */}
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate text-center w-full drop-shadow-sm select-none">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate w-full text-center select-none drop-shadow-sm">
                       {groupName}
                     </span>
 
                     {/* Right Screw */}
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner shrink-0 flex items-center justify-center">
                       <div className="w-[1px] h-0.5 bg-black/40 -rotate-45" />
                     </div>
 
