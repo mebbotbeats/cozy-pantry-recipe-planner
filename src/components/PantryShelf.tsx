@@ -56,7 +56,7 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     
                     {/* 1. THE CARDS */}
                     {/* pb-5 matches the tuck depth */}
-                    <div className="flex items-end justify-start space-x-2 px-4 pb-5 relative z-10">
+                    <div className="flex items-end justify-start space-x-3 px-4 pb-5 relative z-10">
                       <AnimatePresence mode="popLayout">
                         {items.map((item) => (
                           <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
