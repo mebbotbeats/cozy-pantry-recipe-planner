@@ -20,14 +20,14 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
   }, {} as Record<string, Ingredient[]>);
 
   return (
-    <div className="flex-1 flex flex-col relative overflow-visible z-[1] group min-h-0 mt-2 sm:mt-4">
+    <div className="flex-1 flex flex-col relative overflow-visible z-[1] group min-h-0 mt-4">
       
       <div className="flex-1 relative flex flex-col justify-end overflow-visible min-h-0">
         
-        {/* Shelf Surface & Horizontal Scroll Area */}
+        {/* Horizontal Scroll Area */}
         <div className="relative z-10 w-full flex flex-col justify-end min-h-0">
           
-          <div className="flex items-end overflow-x-auto shelf-scroll px-8 space-x-6 min-h-[120px] pb-1 relative z-10">
+          <div className="flex items-end overflow-x-auto shelf-scroll px-8 space-x-6 min-h-[120px] pb-[1px] relative z-10">
             
             {ingredients.length === 0 ? (
               <div className="h-10 sm:h-14 flex items-center px-4 opacity-40 text-[11px] text-[#5c4a3d] font-medium tracking-wide pb-2">
@@ -37,17 +37,14 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
               Object.entries(groupedIngredients).map(([groupName, items]) => (
                 
                 /* =========================================================
-                 * 3. THE WRAPPER CLASS
-                 * Relative positioning anchors the absolute label.
+                 * THE BULLETPROOF GRID WRAPPER
+                 * Using CSS Grid to overlap items in the exact same cell.
                  * ========================================================= */
-                <div key={groupName} className="relative flex items-end justify-center pt-4">
+                <div key={groupName} className="grid items-end justify-items-center relative">
                   
-                  {/* =========================================================
-                   * 1. THE CARDS CLASS (Normal Flow)
-                   * Defines the physical size of the group.
-                   * pb-4 lifts the cards so their bottom is covered by the label.
-                   * ========================================================= */ }
-                  <div className="flex items-end space-x-2 px-3 pb-4 relative z-10">
+                  {/* 1. THE CARDS (Z-Index 10) */}
+                  {/* Assigned to Grid Cell 1x1. pb-4 lifts them up off the floor! */}
+                  <div className="col-start-1 row-start-1 flex items-end space-x-2 px-3 pb-4 z-10">
                     <AnimatePresence mode="popLayout">
                       {items.map((item) => (
                         <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
@@ -55,20 +52,17 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                     </AnimatePresence>
                   </div>
 
-                  {/* =========================================================
-                   * 2. THE LABEL CLASS (Absolute Positioning)
-                   * absolute bottom-0 locks it exactly over the pb-4 area!
-                   * z-20 puts it in front of the cards.
-                   * ========================================================= */ }
-                  <div className="absolute bottom-0 left-0 right-0 z-20 h-6 bg-[#e8dbce] rounded-[4px_4px_2px_2px] border border-[#c4b2a3] shadow-[0_-2px_6px_rgba(0,0,0,0.15)] flex items-center justify-between px-2">
+                  {/* 2. THE TRAY LIP (Z-Index 20) */}
+                  {/* Also assigned to Grid Cell 1x1. self-end forces it to the bottom. w-full spans the cards. */}
+                  <div className="col-start-1 row-start-1 self-end w-full z-20 h-7 bg-[#e8dbce] rounded-[4px_4px_2px_2px] border-t-2 border-b border-x border-[#c4b2a3] shadow-[0_-2px_4px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.8)] flex items-center justify-between px-2">
                     
                     {/* Left Screw */}
                     <div className="w-1.5 h-1.5 rounded-full bg-[#8c7a6b] shadow-inner flex items-center justify-center shrink-0">
                       <div className="w-[1px] h-0.5 bg-black/40 rotate-45" />
                     </div>
                     
-                    {/* Category Text */}
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate select-none text-center w-full">
+                    {/* Category Label */}
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#4a3b32] font-bold px-2 truncate text-center w-full select-none drop-shadow-sm">
                       {groupName}
                     </span>
 
