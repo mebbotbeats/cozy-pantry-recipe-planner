@@ -29,7 +29,7 @@ export default function IngredientCard({ ingredient, onRemove }: IngredientCardP
         rotateX: 10, 
         rotateZ: 2, 
         zIndex: 50,
-        boxShadow: "0px 15px 20px rgba(62, 39, 35, 0.3)" 
+        boxShadow: "0px 15px 20px rgba(0, 0, 0, 0.4)" 
       }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={`
@@ -48,10 +48,11 @@ export default function IngredientCard({ ingredient, onRemove }: IngredientCardP
       {/* Subtle paper texture overlay */}
       <div className="absolute inset-0 opacity-20 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/paper.png')]" />
       
-      {/* NEW: Subtle bottom shadow gradient to ground the card (similar to fruit crates) */}
+      {/* Subtle bottom shadow gradient to ground the card (similar to fruit crates) */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
 
-      <div className="handwriting font-bold text-center leading-tight z-10 px-1 drop-shadow-sm text-[#3e2723]">
+      {/* UPDATED: Added dark:text-white and transition for Dark Mode support */}
+      <div className="handwriting font-bold text-center leading-tight z-10 px-1 drop-shadow-sm text-[#3e2723] dark:text-white transition-colors duration-300">
         {ingredient.label}
       </div>
       

@@ -9,32 +9,54 @@
 :root {
   --pantry-bg: #fdf6e3; /* Bright, creamy Alpine beige */
   --text-dark: #5d4037;
+  --shelf-wood: #b89570;
+}
+
+/* Dark Mode Variables */
+.dark {
+  --pantry-bg: #1a1c1e; /* Deep midnight charcoal */
+  --text-dark: #ece3d4;
+  --shelf-wood: #5e432a;
 }
 
 body {
   background-color: var(--pantry-bg);
   color: var(--text-dark);
   font-family: var(--font-sans);
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 .handwriting { 
   font-family: var(--font-hand); 
 }
 
-/* The bright, cozy cabinet frame */
+/* THE CABINET WALLS */
 .carved-wall {
+  transition: box-shadow 0.5s ease;
   box-shadow: 
     inset 60px 0 100px -20px rgba(255, 255, 255, 0.5), 
     inset -60px 0 100px -20px rgba(255, 255, 255, 0.5);
 }
 
-/* Brighter, softer bokeh-like ambient glow */
+.dark .carved-wall {
+  box-shadow: 
+    inset 60px 0 120px -20px rgba(0, 0, 0, 0.7), 
+    inset -60px 0 120px -20px rgba(0, 0, 0, 0.7);
+}
+
+/* AMBIENT GLOW */
 .bokeh-glow {
+  transition: background 0.5s ease;
   background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(253, 246, 227, 0.1) 70%);
 }
 
-/* The God-Ray Sunbeam */
+.dark .bokeh-glow {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.3) 70%);
+}
+
+/* THE SUNBEAM / MOONBEAM */
 .sunbeam {
+  transition: opacity 0.5s ease, background 0.5s ease;
   background: linear-gradient(
     110deg, 
     rgba(255, 255, 255, 0) 20%, 
@@ -46,48 +68,17 @@ body {
   mix-blend-mode: overlay;
 }
 
-/* Custom horizontal scroll bar for shelves */
-.shelf-scroll::-webkit-scrollbar { 
-  height: 6px; 
+.dark .sunbeam {
+  opacity: 0.15;
+  background: linear-gradient(
+    110deg, 
+    rgba(130, 160, 255, 0) 20%, 
+    rgba(130, 160, 255, 0.2) 50%, 
+    rgba(130, 160, 255, 0) 80%
+  );
 }
 
-.shelf-scroll::-webkit-scrollbar-track { 
-  background: rgba(0,0,0,0.02); 
-}
-
-.shelf-scroll::-webkit-scrollbar-thumb { 
-  background: rgba(0,0,0,0.06); 
-  border-radius: 10px; 
-}
-
-/* Floating Dust Particles */
-@keyframes floatUp {
-  0% { 
-    transform: translateY(0) translateX(0) scale(0.8); 
-    opacity: 0; 
-  }
-  20% { 
-    opacity: 0.8; 
-  }
-  80% { 
-    opacity: 0.6; 
-  }
-  100% { 
-    transform: translateY(-150px) translateX(50px) scale(1.2); 
-    opacity: 0; 
-  }
-}
-
-.dust-particle {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 50%;
-  filter: blur(1.5px);
-  animation: floatUp 8s infinite linear;
-  pointer-events: none;
-}
-
-/* Organic horizontal scroll bar for shelves */
+/* ORGANIC HORIZONTAL SCROLLBAR */
 .shelf-scroll {
   scrollbar-width: thin;
   scrollbar-color: #a39182 transparent;
@@ -100,15 +91,46 @@ body {
 .shelf-scroll::-webkit-scrollbar-track {
   background: rgba(94, 67, 42, 0.05);
   border-radius: 10px;
-  margin: 0 20px; /* Keeps scrollbar from hitting the exact edge */
+  margin: 0 20px;
+}
+
+.dark .shelf-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .shelf-scroll::-webkit-scrollbar-thumb {
-  background: #c4b2a3; /* Matches the tray color */
+  background: #c4b2a3;
   border-radius: 10px;
-  border: 2px solid var(--pantry-bg); /* Creates a floating organic pill effect */
+  border: 2px solid var(--pantry-bg);
+  transition: background 0.3s ease;
+}
+
+.dark .shelf-scroll::-webkit-scrollbar-thumb {
+  background: #5d4a3d;
 }
 
 .shelf-scroll::-webkit-scrollbar-thumb:hover {
   background: #a39182;
+}
+
+/* DUST PARTICLES */
+@keyframes floatUp {
+  0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(-150px) translateX(50px) scale(1.2); opacity: 0; }
+}
+
+.dust-particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  filter: blur(1.5px);
+  animation: floatUp 8s infinite linear;
+  pointer-events: none;
+}
+
+.dark .dust-particle {
+  opacity: 0.4;
+  background: rgba(200, 220, 255, 0.5);
 }

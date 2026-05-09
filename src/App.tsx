@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, ChefHat, RotateCcw, LogOut, Check } from "lucide-react";
+import { Plus, ChefHat, RotateCcw, LogOut, Check, Moon, Sun } from "lucide-react";
 import { Ingredient, MealPlanResponse } from "./types";
 import { organizePantry, generateMealPlan } from "./services/aiService";
 import PantryShelf from "./components/PantryShelf";
@@ -20,11 +20,12 @@ const normalizeShelves = (items: Ingredient[]) => {
 };
 
 export default function App() {
-  const[ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [isInputOpen, setIsInputOpen] = useState(false);
   const [isPlanOpen, setIsPlanOpen] = useState(false);
-  const[isOrganizing, setIsOrganizing] = useState(false);
+  const [isOrganizing, setIsOrganizing] = useState(false);
   const [mealPlan, setMealPlan] = useState<MealPlanResponse | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false); // Dark Mode State
 
   const [user, setUser] = useState<User | null>(null);
   const [credits, setCredits] = useState<number>(0);
@@ -52,14 +53,14 @@ export default function App() {
     });
 
     return () => subscription.unsubscribe();
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (user) {
       supabase.from("profiles").select("credits").eq("id", user.id).single()
         .then(({ data }) => setCredits(data?.credits || 0));
     }
-  },[user, isOrganizing, mealPlan]);
+  }, [user, isOrganizing, mealPlan]);
 
   const handleLogin = async () => await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin } });
   const handleLogout = async () => await supabase.auth.signOut();
@@ -82,11 +83,10 @@ export default function App() {
     const saved = localStorage.getItem("cozy-pantry-storage");
     if (saved) {
       try { 
-        // Load and fix any broken groups from cache!
         setIngredients(normalizeShelves(JSON.parse(saved))); 
       } catch (e) { }
     }
-  },[]);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("cozy-pantry-storage", JSON.stringify(ingredients));
@@ -99,7 +99,6 @@ export default function App() {
       const newItems = await organizePantry(input);
       if (newItems.length > 0) {
         setIngredients((prev) => {
-          // Combine old and new, then normalize so the AI doesn't fragment groups
           return normalizeShelves([...prev, ...newItems]);
         });
         setIsInputOpen(false);
@@ -127,7 +126,7 @@ export default function App() {
     }
   };
 
-  const[isExporting, setIsExporting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const handleSaveRecipe = async () => {
     setIsExporting(true);
     try {
@@ -144,7 +143,7 @@ export default function App() {
   };
 
   return (
-    <div id="app-root" className="h-screen w-screen overflow-hidden bg-[var(--pantry-bg)] flex flex-col relative">
+    <div id="app-root" className={`${isDarkMode ? 'dark' : ''} h-screen w-screen overflow-hidden bg-[var(--pantry-bg)] flex flex-col relative transition-colors duration-500`}>
       
       <div id="pantry-capture-zone" className="flex-1 w-full flex flex-col relative bokeh-glow min-h-0">
         
@@ -159,31 +158,40 @@ export default function App() {
 
         <header className="flex items-center justify-between p-3 sm:p-4 px-6 sm:px-10 shrink-0 z-[50]">
           <div className="flex items-baseline gap-3">
-            <h1 className="handwriting text-3xl sm:text-4xl font-bold text-[#5d4037] drop-shadow-sm">PantryPlanet</h1>
-            <p className="text-[8px] uppercase tracking-[0.3em] text-[#5d4037]/40 font-bold hidden md:block">The Art of the Ingredient</p>
+            <h1 className="handwriting text-3xl sm:text-4xl font-bold text-[var(--text-dark)] drop-shadow-sm transition-colors duration-500">PantryPlanet</h1>
+            <p className="text-[8px] uppercase tracking-[0.3em] text-[var(--text-dark)]/40 font-bold hidden md:block transition-colors duration-500">The Art of the Ingredient</p>
           </div>
           
           <div className="flex items-center gap-2 sm:gap-4">
+            {/* DARK MODE TOGGLE */}
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-2 rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 text-[var(--text-dark)] transition-all"
+              title="Toggle Dark Mode"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+
             {!user ? (
               <button onClick={handleLogin} className="px-4 py-1.5 bg-[#5d4037] text-[#fdf6e3] rounded-lg font-bold text-sm shadow-sm hover:scale-105 active:scale-95 transition-all">
                 Sign In
               </button>
             ) : (
-              <div className="flex items-center gap-2 sm:gap-3 bg-[#fdf6e3]/50 px-3 py-1.5 rounded-xl border border-[#5d4037]/10 shadow-sm backdrop-blur-sm">
-                <span className="handwriting text-base sm:text-lg font-bold text-[#5d4037]">Credits: {credits}</span>
+              <div className="flex items-center gap-2 sm:gap-3 bg-[var(--text-dark)]/5 dark:bg-white/5 px-3 py-1.5 rounded-xl border border-[var(--text-dark)]/10 shadow-sm backdrop-blur-sm transition-colors">
+                <span className="handwriting text-base sm:text-lg font-bold text-[var(--text-dark)]">Credits: {credits}</span>
                 {credits <= 2 && (
                   <button onClick={handleRefill} className="text-[10px] sm:text-xs bg-[#e5c49f] text-[#5d4037] px-2 py-1 rounded-md shadow-sm hover:scale-105 active:scale-95 font-bold transition-all">
                     Refill ($5)
                   </button>
                 )}
-                <div className="w-px h-4 bg-[#5d4037]/20 mx-1" />
-                <button onClick={handleLogout} className="text-[#5d4037]/50 hover:text-[#5d4037] transition-colors" title="Log out">
+                <div className="w-px h-4 bg-[var(--text-dark)]/20 mx-1" />
+                <button onClick={handleLogout} className="text-[var(--text-dark)]/50 hover:text-[var(--text-dark)] transition-colors" title="Log out">
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
             )}
             <div className="flex gap-1 ml-1 sm:ml-2">
-              <button onClick={clearPantry} className="p-2 rounded-full hover:bg-black/5 text-[#5d4037]/40 hover:text-[#5d4037] transition-all" title="Clear Pantry">
+              <button onClick={clearPantry} className="p-2 rounded-full hover:bg-black/5 text-[var(--text-dark)]/40 hover:text-[var(--text-dark)] transition-all" title="Clear Pantry">
                 <RotateCcw className="w-4 h-4" />
               </button>
             </div>
