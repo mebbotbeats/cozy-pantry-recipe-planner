@@ -40,7 +40,6 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
         
         <div className="relative z-10 w-full flex flex-col justify-end min-h-0 min-w-0 max-w-full">
           
-          {/* UPDATED: Added overflow-y-hidden to remove the vertical scrollbar entirely */}
           <div className="flex items-end justify-start overflow-x-auto overflow-y-hidden shelf-scroll px-6 sm:px-10 space-x-4 sm:space-x-8 min-h-[130px] pb-0 relative z-10 w-full">
             
             {ingredients.length === 0 ? (
@@ -55,7 +54,8 @@ export default function PantryShelf({ ingredients, onRemove }: PantryShelfProps)
                   <div key={groupName} className="relative inline-flex flex-col items-start pt-6 shrink-0">
                     
                     {/* 1. THE CARDS */}
-                    <div className="flex items-end justify-start space-x-2 px-4 pb-6 relative z-10">
+                    {/* pb-4 ensures the cards hide "only a little" (approx 8px) behind the crate front */}
+                    <div className="flex items-end justify-start space-x-2 px-4 pb-4 relative z-10">
                       <AnimatePresence mode="popLayout">
                         {items.map((item) => (
                           <IngredientCard key={item.id} ingredient={item} onRemove={onRemove} />
